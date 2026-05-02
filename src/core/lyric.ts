@@ -17,13 +17,12 @@ import {
 } from '@/core/desktopLyric'
 import { getPosition } from '@/plugins/player'
 import playerState from '@/store/player/state'
-import settingState from '@/store/setting/state'
-import { updateNowPlayingTitles } from '@/plugins/player/utils'
+// import settingState from '@/store/setting/state'
 
 /**
  * init lyric
  */
-export const init = async() => {
+export const init = async () => {
   return lrcInit()
 }
 
@@ -32,14 +31,9 @@ export const init = async() => {
  * @param lyric lyric str
  * @param translation lyric translation
  */
-const handleSetLyric = async(lyric: string, translation = '', romalrc = '') => {
+const handleSetLyric = async (lyric: string, translation = '', romalrc = '') => {
   lrcSetLyric(lyric, translation, romalrc)
   await setDesktopLyric(lyric, translation, romalrc)
-  if (settingState.setting['player.isShowBluetoothFullLyric']) {
-    void updateNowPlayingTitles({
-      lyric,
-    })
-  }
 }
 
 /**
@@ -70,7 +64,7 @@ export const stop = () => {
  * set playback rate
  * @param playbackRate playback rate
  */
-export const setPlaybackRate = async(playbackRate: number) => {
+export const setPlaybackRate = async (playbackRate: number) => {
   lrcSetPlaybackRate(playbackRate)
   await setDesktopLyricPlaybackRate(playbackRate)
   if (playerState.isPlay) {
@@ -86,7 +80,7 @@ export const setPlaybackRate = async(playbackRate: number) => {
  * toggle show translation
  * @param isShowTranslation is show translation
  */
-export const toggleTranslation = async(isShowTranslation: boolean) => {
+export const toggleTranslation = async (isShowTranslation: boolean) => {
   lrcToggleTranslation(isShowTranslation)
   await toggleDesktopLyricTranslation(isShowTranslation)
   if (playerState.isPlay) play()
@@ -96,7 +90,7 @@ export const toggleTranslation = async(isShowTranslation: boolean) => {
  * toggle show roma lyric
  * @param isShowLyricRoma is show roma lyric
  */
-export const toggleRoma = async(isShowLyricRoma: boolean) => {
+export const toggleRoma = async (isShowLyricRoma: boolean) => {
   lrcToggleRoma(isShowLyricRoma)
   await toggleDesktopLyricRoma(isShowLyricRoma)
   if (playerState.isPlay) play()
@@ -108,8 +102,7 @@ export const play = () => {
   })
 }
 
-
-export const setLyric = async() => {
+export const setLyric = async () => {
   if (!playerState.musicInfo.id) return
   if (playerState.musicInfo.lrc) {
     let tlrc = ''

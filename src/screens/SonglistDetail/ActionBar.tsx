@@ -3,24 +3,17 @@ import { View } from 'react-native'
 import Button from '@/components/common/Button'
 
 import { createStyle } from '@/utils/tools'
-import { pop } from '@/navigation'
 import { useTheme } from '@/store/theme/hook'
-import commonState from '@/store/common/state'
 import Text from '@/components/common/Text'
 import { handleCollect, handlePlay } from './listAction'
 import songlistState from '@/store/songlist/state'
 import { useI18n } from '@/lang'
 import { useListInfo } from './state'
-// import { NAV_SHEAR_NATIVE_IDS } from '@/config/constant'
 
-export default memo(() => {
+export default memo(({ onBack }: { onBack: () => void }) => { // 确保接收 onBack prop
   const theme = useTheme()
   const t = useI18n()
   const info = useListInfo()
-
-  const back = () => {
-    void pop(commonState.componentIds.songlistDetail!)
-  }
 
   const handlePlayAll = () => {
     if (!songlistState.listDetailInfo.info.name) return
@@ -35,12 +28,16 @@ export default memo(() => {
   return (
     <View style={styles.container}>
       <Button onPress={handleCollection} style={styles.controlBtn}>
-        <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>{t('collect_songlist')}</Text>
+        <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>
+          {t('collect_songlist')}
+        </Text>
       </Button>
       <Button onPress={handlePlayAll} style={styles.controlBtn}>
-        <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>{t('play_all')}</Text>
+        <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>
+          {t('play_all')}
+        </Text>
       </Button>
-      <Button onPress={back} style={styles.controlBtn}>
+      <Button onPress={onBack} style={styles.controlBtn}>
         <Text style={{ ...styles.controlBtnText, color: theme['c-button-font'] }}>{t('back')}</Text>
       </Button>
     </View>
@@ -68,4 +65,3 @@ const styles = createStyle({
     textAlign: 'center',
   },
 })
-

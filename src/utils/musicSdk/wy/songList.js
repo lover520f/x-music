@@ -1,8 +1,3 @@
-// https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/module/playlist_catlist.js
-// https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/module/playlist_hot.js
-// https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/module/top_playlist.js
-// https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/module/playlist_detail.js
-
 import { weapi, linuxapi } from './utils/crypto'
 import { httpFetch } from '../../request'
 import { formatPlayTime, sizeFormate, dateFormat, formatPlayCount } from '../../index'
@@ -24,11 +19,6 @@ export default {
       tid: 'hot',
       id: 'hot',
     },
-    // {
-    //   name: '最新',
-    //   tid: 'new',
-    //   id: 'new',
-    // },
   ],
   regExps: {
     listDetailLink: /^.+(?:\?|&)id=(\d+)(?:&.*$|#.*$|$)/,
@@ -54,7 +44,7 @@ export default {
       id = url
       cookie = `MUSIC_U=${token}`
     }
-    if ((/[?&:/]/.test(id))) {
+    if (/[?&:/]/.test(id)) {
       if (this.regExps.listDetailLink.test(id)) {
         id = id.replace(this.regExps.listDetailLink, '$1')
       } else if (this.regExps.listDetailLink2.test(id)) {
@@ -66,51 +56,79 @@ export default {
     }
     return { id, cookie }
   },
-  async getListDetail(rawId, page, tryNum = 0) { // 获取歌曲列表内的音乐
+
+  async getListDetail(rawId, page, tryNum = 0) {
+    // 获取歌曲列表内的音乐
     if (tryNum > 2) return Promise.reject(new Error('try max num'))
 
     const { id, cookie } = await this.getListId(rawId)
     if (cookie) this.cookie = cookie
 
-    const requestObj_listDetail = httpFetch('https://music.163.com/api/linux/forward', {
+    // 将 linuxapi 调用替换为 weapi 调用
+    const requestObj_listDetail = httpFetch('https://music.163.com/weapi/v3/playlist/detail', {
       method: 'post',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
-        Cookie: this.cookie,
+        'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.54',
+        origin: 'https://music.163.com',
+        Referer: 'https://music.163.com',
+        cookie: this.cookie,
       },
-      credentials: 'omit',
-      cache: 'default',
-      form: linuxapi({
-        method: 'POST',
-        url: 'https://music.163.com/api/v3/playlist/detail',
-        params: {
-          id,
-          n: this.limit_song,
-          s: 8,
-        },
+      form: weapi({
+        id,
+        n: this.limit_song,
+        s: 8,
+        csrf_token: '',
       }),
     })
+
     const { statusCode, body } = await requestObj_listDetail.promise
-    if (statusCode !== 200 || body.code !== this.successCode) return this.getListDetail(id, page, ++tryNum)
+    if (statusCode !== 200 || body.code !== this.successCode) {
+      if (body.code === 401) {
+        throw new Error(body.message || '该歌单为隐私歌单或需要登录')
+      }
+      return this.getListDetail(rawId, page, ++tryNum)
+    }
+    if (!body.playlist.trackIds || body.playlist.trackIds.length === 0) {
+      return {
+        list: [],
+        page: 1,
+        limit: this.limit_song,
+        total: 0,
+        source: 'wy',
+        info: {
+          play_count: formatPlayCount(body.playlist.playCount),
+          name: body.playlist.name,
+          img: body.playlist.coverImgUrl,
+          desc: body.playlist.description,
+          author: body.playlist.creator.nickname,
+          userId: body.playlist.userId,
+        },
+      }
+    }
+
     let limit = 1000
     let rangeStart = (page - 1) * limit
-    // console.log(body)
     let list
     if (body.playlist.trackIds.length == body.privileges.length) {
       list = this.filterListDetail(body)
     } else {
       try {
-        list = (await musicDetailApi.getList(body.playlist.trackIds.slice(rangeStart, limit * page).map(trackId => trackId.id))).list
+        list = (
+          await musicDetailApi.getList(
+            body.playlist.trackIds.slice(rangeStart, limit * page).map((trackId) => trackId.id)
+          )
+        ).list
       } catch (err) {
         console.log(err)
         if (err.message == 'try max num') {
           throw err
         } else {
-          return this.getListDetail(id, page, ++tryNum)
+          return this.getListDetail(rawId, page, ++tryNum)
         }
       }
     }
-    // console.log(list)
+
     return {
       list,
       page,
@@ -123,8 +141,9 @@ export default {
         img: body.playlist.coverImgUrl,
         desc: body.playlist.description,
         author: body.playlist.creator.nickname,
+        userId: body.playlist.userId,
       },
-    }
+    };
   },
   filterListDetail({ playlist: { tracks }, privileges }) {
     // console.log(tracks, privileges)
@@ -134,19 +153,19 @@ export default {
       const _types = {}
       let size
       let privilege = privileges[index]
-      if (privilege.id !== item.id) privilege = privileges.find(p => p.id === item.id)
+      if (privilege.id !== item.id) privilege = privileges.find((p) => p.id === item.id)
       if (!privilege) return
 
       if (privilege.maxBrLevel == 'hires') {
         size = item.hr ? sizeFormate(item.hr.size) : null
-        types.push({ type: 'flac24bit', size })
-        _types.flac24bit = {
+        types.push({ type: 'hires', size })
+        _types.hires = {
           size,
         }
       }
       switch (privilege.maxbr) {
         case 999000:
-          size = null
+          size = item.sq ? sizeFormate(item.sq.size) : null;
           types.push({ type: 'flac', size })
           _types.flac = {
             size,
@@ -171,6 +190,7 @@ export default {
       if (item.pc) {
         list.push({
           singer: item.pc.ar ?? '',
+          artists: item.ar,
           name: item.pc.sn ?? '',
           albumName: item.pc.alb ?? '',
           albumId: item.al?.id,
@@ -187,6 +207,7 @@ export default {
       } else {
         list.push({
           singer: formatSingerName(item.ar, 'name'),
+          artists: item.ar,
           name: item.name ?? '',
           albumName: item.al?.name,
           albumId: item.al?.id,
@@ -199,6 +220,11 @@ export default {
           types,
           _types,
           typeUrl: {},
+          meta: {
+            fee: item.fee,
+            originCoverType: item.originCoverType,
+            mv: item.mv,
+          }
         })
       }
     })
@@ -233,7 +259,7 @@ export default {
   },
   filterList(rawData) {
     // console.log(rawData)
-    return rawData.map(item => ({
+    return rawData.map((item) => ({
       play_count: formatPlayCount(item.playCount),
       id: String(item.id),
       author: item.creator.nickname,
@@ -244,6 +270,7 @@ export default {
       total: item.trackCount,
       desc: item.description,
       source: 'wy',
+      userId: item.userId,
     }))
   },
 
@@ -300,7 +327,7 @@ export default {
     })
   },
   filterHotTagInfo(rawList) {
-    return rawList.map(item => ({
+    return rawList.map((item) => ({
       id: item.playlistTag.name,
       name: item.playlistTag.name,
       source: 'wy',
@@ -308,7 +335,11 @@ export default {
   },
 
   getTags() {
-    return Promise.all([this.getTag(), this.getHotTag()]).then(([tags, hotTag]) => ({ tags, hotTag, source: 'wy' }))
+    return Promise.all([this.getTag(), this.getHotTag()]).then(([tags, hotTag]) => ({
+      tags,
+      hotTag,
+      source: 'wy',
+    }))
   },
 
   async getDetailPageUrl(rawId) {
@@ -323,17 +354,16 @@ export default {
       limit,
       total: page == 1,
       offset: limit * (page - 1),
+    }).promise.then(({ body }) => {
+      if (body.code != this.successCode) throw new Error('filed')
+      // console.log(body)
+      return {
+        list: this.filterList(body.result.playlists),
+        limit,
+        total: body.result.playlistCount,
+        source: 'wy',
+      }
     })
-      .promise.then(({ body }) => {
-        if (body.code != this.successCode) throw new Error('filed')
-        // console.log(body)
-        return {
-          list: this.filterList(body.result.playlists),
-          limit,
-          total: body.result.playlistCount,
-          source: 'wy',
-        }
-      })
   },
 }
 

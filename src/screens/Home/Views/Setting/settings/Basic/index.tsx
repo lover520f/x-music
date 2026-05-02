@@ -11,36 +11,40 @@ import IsStartupAutoPlay from './IsStartupAutoPlay'
 import IsStartupPushPlayDetailScreen from './IsStartupPushPlayDetailScreen'
 import IsAutoHidePlayBar from './IsAutoHidePlayBar'
 import IsHomePageScroll from './IsHomePageScroll'
-import IsAllowProgressBarSeek from './IsAllowProgressBarSeek'
-import IsUseSystemFileSelector from './IsUseSystemFileSelector'
-import IsAlwaysKeepStatusbarHeight from './IsAlwaysKeepStatusbarHeight'
 import IsShowBackBtn from './IsShowBackBtn'
 import IsShowExitBtn from './IsShowExitBtn'
+import IsUseSystemFileSelector from './IsUseSystemFileSelector'
+import IsAlwaysKeepStatusbarHeight from './IsAlwaysKeepStatusbarHeight'
 import DrawerLayoutPosition from './DrawerLayoutPosition'
 import { useI18n } from '@/lang/i18n'
+import WyCookie from './WyCookie'
+import NavMenu from "@/screens/Home/Views/Setting/settings/Basic/NavMenu.tsx";
 
 export default memo(() => {
   const t = useI18n()
 
-
   return (
     <Section title={t('setting_basic')}>
       <IsStartupAutoPlay />
-      <IsStartupPushPlayDetailScreen />
-      <IsShowBackBtn />
-      <IsShowExitBtn />
-      <IsAutoHidePlayBar />
+      {/*<IsStartupPushPlayDetailScreen />*/}
+      {global.lx.isCarMode ? (
+        <>
+          <IsShowBackBtn />
+          <IsShowExitBtn />
+        </>
+      ) : null}
       <IsHomePageScroll />
-      <IsAllowProgressBarSeek />
       <IsUseSystemFileSelector />
       <IsAlwaysKeepStatusbarHeight />
       <Theme />
       <DrawerLayoutPosition />
+      <NavMenu />
       <Language />
       <FontSize />
       <ShareType />
       <Source />
       <SourceName />
+      <WyCookie />
     </Section>
   )
 })

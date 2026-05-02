@@ -1,5 +1,5 @@
 export const HEADER_HEIGHT = 42
-export const LIST_ITEM_HEIGHT = 54
+export const LIST_ITEM_HEIGHT = 70
 export const LIST_SCROLL_POSITION_KEY = '__LIST_SCROLL_POSITION_KEY__'
 
 export const SPLIT_CHAR = {
@@ -25,6 +25,10 @@ export enum COMPONENT_IDS {
   playDetail = 'playDetail',
   songlistDetail = 'songlistDetail',
   comment = 'comment',
+  ARTIST_DETAIL = 'ARTIST_DETAIL',
+  ALBUM_DETAIL_SCREEN = 'ALBUM_DETAIL_SCREEN',
+  DOWNLOAD_MANAGER = 'DOWNLOAD_MANAGER',
+  SIMILAR_SONGS_SCREEN = 'SIMILAR_SONGS_SCREEN',
 }
 
 export enum NAV_SHEAR_NATIVE_IDS {
@@ -35,7 +39,6 @@ export enum NAV_SHEAR_NATIVE_IDS {
   songlistDetail_pic = 'songlistDetail_pic',
   songlistDetail_title = 'songlistDetail_title',
 }
-
 
 export const storageDataPrefix = {
   setting: '@setting_v1',
@@ -51,6 +54,7 @@ export const storageDataPrefix = {
   musicOtherSource: '@music_other_source__',
   playInfo: '@play_info',
 
+  sync: '@sync_',
   syncAuthKey: '@sync_auth_key',
   syncHost: '@sync_host',
   syncHostHistory: '@sync_host_history',
@@ -67,6 +71,7 @@ export const storageDataPrefix = {
   leaderboardSetting: '@leaderboard_setting',
   songListSetting: '@songist_setting',
   searchSetting: '@search_setting',
+  lastSelectQuality: '@last_select_quality',
 
   fontSize: '@font_size',
 
@@ -76,8 +81,12 @@ export const storageDataPrefix = {
   remoteLyricTip: '@remote_lyric_tip',
 
   dislikeList: '@dislike_list',
+  playlistType: '@playlist_type',
 
   userApi: '@user_api__',
+  downloadList: '@download_list',
+  wyUidCache: '@wy_uid_cache__',
+  similarSongsCache: '@similar_songs_cache',
 } as const
 
 // v0.x.x 版本的 data keys
@@ -95,19 +104,22 @@ export const storageDataPrefixOld = {
   notificationTipEnable: '@notification_tip_enable',
 } as const
 
-export const APP_PROVIDER_NAME = 'cn.toside.music.mobile.provider'
-
+export const APP_PROVIDER_NAME = 'com.lxnetease.music.mobile.provider'
 
 export const NAV_MENUS = [
   { id: 'nav_search', icon: 'search-2' },
   { id: 'nav_songlist', icon: 'album' },
   { id: 'nav_top', icon: 'leaderboard' },
   { id: 'nav_love', icon: 'love' },
+  { id: 'nav_daily_rec', icon: 'svg:calendar' },
+  { id: 'nav_followed_artists', icon: 'svg:artist' },
+  { id: 'nav_subscribed_albums', icon: 'svg:album-disc' },
+  { id: 'nav_my_playlist', icon: 'album' },
   // { id: 'download', icon: 'download-2' },
   { id: 'nav_setting', icon: 'setting' },
 ] as const
 
-export type NAV_ID_Type = typeof NAV_MENUS[number]['id']
+export type NAV_ID_Type = (typeof NAV_MENUS)[number]['id']
 
 export const LXM_FILE_EXT_RXP = ['json', 'lxmc', 'bin']
 export const USER_API_SOURCE_FILE_EXT_RXP = ['js']
@@ -117,6 +129,7 @@ export const MUSIC_TOGGLE_MODE = {
   random: 'random', // 列表随机
   list: 'list', // 顺序播放
   singleLoop: 'singleLoop', // 单曲循环
+  heartbeat: 'heartbeat', // 心动模式
   none: 'none', // 禁用
 } as const
 
@@ -142,9 +155,9 @@ export const DEFAULT_SETTING = {
   },
 
   search: {
-    temp_source: 'kw' as LX.OnlineSource,
-    source: 'all' as LX.OnlineSource | 'all',
-    type: 'music' as 'music' | 'songlist',
+    temp_source: 'wy' as LX.OnlineSource,
+    source: 'wy' as LX.OnlineSource | 'wy',
+    type: 'music' as 'music' | 'songlist' | 'singer' | 'album',
   },
 
   viewPrevState: {

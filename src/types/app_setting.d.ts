@@ -1,11 +1,14 @@
 import type { I18n } from '@/lang/i18n'
+import {NAV_ID_Type} from "@/config/constant.ts";
 
 declare global {
   namespace LX {
     type AddMusicLocationType = 'top' | 'bottom'
+    type DownloadFileNameFormat = '歌名 - 歌手' | '歌手 - 歌名' | '歌名'
 
     interface AppSetting {
       version: string
+      'version.autoCheckUpdate': boolean;
       /**
        * 是否跟随系统切换亮暗主题
        */
@@ -52,11 +55,6 @@ declare global {
       'common.homePageScroll': boolean
 
       /**
-       * 允许通过底栏进度条调整进度
-       */
-      'common.allowProgressBarSeek': boolean
-
-      /**
        * 是否显示返回按钮
        */
       'common.showBackBtn': boolean
@@ -72,9 +70,18 @@ declare global {
       'common.useSystemFileSelector': boolean
 
       /**
+       * 网易云音乐 Cookie
+       */
+      'common.wy_cookie': string
+      'common.yt_cookie': string
+
+      /**
        * 总是保留状态栏高度
        */
       'common.alwaysKeepStatusbarHeight': boolean
+
+
+      'common.navStatus': Partial<Record<NAV_ID_Type, boolean>>;
 
       /**
        * 主题id
@@ -102,6 +109,15 @@ declare global {
       'theme.dynamicBg': boolean
 
       /**
+       * 动态背景模糊度
+       */
+      'theme.blur': number
+
+      'theme.picOpacity': number
+
+      'theme.customBgPicPath': string
+
+      /**
        * 字体阴影
        */
       'theme.fontShadow': boolean
@@ -119,7 +135,7 @@ declare global {
       /**
        * 切歌模式
        */
-      'player.togglePlayMethod': 'listLoop' | 'random' | 'list' | 'singleLoop' | 'none'
+      'player.togglePlayMethod': 'listLoop' | 'random' | 'list' | 'singleLoop' | 'heartbeat' | 'none'
 
       /**
        * 优先播放的音质
@@ -197,25 +213,11 @@ declare global {
       'player.isShowBluetoothLyric': boolean
 
       /**
-       * 是否启用蓝牙完整歌词
-       */
-      'player.isShowBluetoothFullLyric': boolean
-
-      /**
-       * 播放详情页-是否缩放当前播放的歌词行
-       */
-      // 'playDetail.isZoomActiveLrc': boolean
-
-      /**
-       * 播放详情页-是否允许通过歌词调整播放进度
-       */
-      // 'playDetail.isShowLyricProgressSetting': boolean
-
-      /**
        * 播放详情页-歌词对齐方式
        */
       'playDetail.style.align': 'center' | 'left' | 'right'
 
+      'playDetail.isCoverSpin': boolean
       /**
        * 竖屏歌词字体大小
        */
@@ -297,13 +299,13 @@ declare global {
       'desktopLyric.style.lyricUnplayColor': string
 
       /**
-        * 桌面歌词已播放字体颜色
-        */
+       * 桌面歌词已播放字体颜色
+       */
       'desktopLyric.style.lyricPlayedColor': string
 
       /**
-        * 桌面歌词字体阴影颜色
-        */
+       * 桌面歌词字体阴影颜色
+       */
       'desktopLyric.style.lyricShadowColor': string
 
       /**
@@ -335,6 +337,7 @@ declare global {
        * 是否显示歌曲时长
        */
       'list.isShowInterval': boolean
+      'list.isShowCover': boolean
 
       /**
        * 是否自动恢复列表滚动位置（仅对我的列表有效）
@@ -346,16 +349,66 @@ declare global {
        */
       'list.addMusicLocationType': AddMusicLocationType
 
+      'list.isShowMyListSubMenu': boolean
+      'list.isAutoSaveDailyRec': boolean
+
+      'menu.playLater': boolean
+      'menu.addTo': boolean
+      'menu.share': boolean
+      'menu.playMV': boolean
+      'menu.songDetail': boolean
+      'menu.dislike': boolean
+
+      'menu.moveTo': boolean
+      'menu.changePosition': boolean
+      'menu.changeSource': boolean
+
+      'artistDetail.albumViewMode': 'grid' | 'list'
+      /**
+       * 是否启用下载
+       */
+      'download.enable': boolean
+
+      'download.path': string
       /**
        * 文件命名方式
        */
       'download.fileName': '歌名 - 歌手' | '歌手 - 歌名' | '歌名'
 
       /**
+       * 是否写入歌词
+       */
+      'download.writeLyric': boolean
+       /**
+         * 是否写入罗马音歌词
+       */
+      'download.writeRomaLyric': boolean
+      /**
+       * 是否内嵌歌词到音频文件
+       */
+      'download.writeEmbedLyric': boolean
+      /**
+       * 是否写入封面
+       */
+      'download.writePicture': boolean
+
+      /**
+       * 是否写入元数据
+       */
+      'download.writeMetadata': boolean
+      'download.writeAlias': boolean
+
+      /**
        * 是否启用同步
        */
       'sync.enable': boolean
+      'sync.webdav.enable': boolean;
+      'sync.webdav.syncLists': boolean;
+      'sync.webdav.url': string;
+      'sync.webdav.username': string;
+      'sync.webdav.password': string;
+      'sync.webdav.path': string;
+      'sync.webdav.lastSyncTimeLists': number;
     }
   }
 }
-

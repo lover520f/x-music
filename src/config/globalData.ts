@@ -20,15 +20,16 @@ if (process.versions == null) {
 //   screenH = temp
 // }
 
-
 global.lx = {
-  fontSize: 1,
+  fontSize: 0.9,
   playerStatus: {
     isInitialized: false,
     isRegisteredService: false,
     isIniting: false,
   },
+  isCarMode: false,
 
+  playerError: false,
   restorePlayInfo: null,
   // allList: null,
   // globalObj: null,
@@ -53,7 +54,7 @@ global.lx = {
 
   qualityList: {},
   apis: {},
-  apiInitPromise: [Promise.resolve(false), true, () => {}],
+  apiInitPromise: [Promise.resolve(false), true, () => { }],
 
   jumpMyListPosition: false,
 

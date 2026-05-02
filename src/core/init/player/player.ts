@@ -2,13 +2,12 @@ import { addPlayedList, clearPlayedList } from '@/core/player/playedList'
 import { pause, playNext } from '@/core/player/player'
 import { setStatusText, setIsPlay } from '@/core/player/playStatus'
 // import { resetPlayerMusicInfo } from '@/core/player/playInfo'
-import { setStop } from '@/plugins/player'
+import { setStop, updateOptions } from '@/plugins/player'
 import { delayUpdateMusicInfo } from '@/plugins/player/playList'
 import playerState from '@/store/player/state'
 import settingState from '@/store/setting/state'
 
-
-export default async(setting: LX.AppSetting) => {
+export default async (setting: LX.AppSetting) => {
   const setPlayStatus = () => {
     setIsPlay(true)
   }
@@ -25,7 +24,7 @@ export default async(setting: LX.AppSetting) => {
     }
     // resetPlayerMusicInfo()
     // global.app_event.stop()
-    global.app_event.setProgress(0)
+    // global.app_event.setProgress(0)
     setStatusText(global.i18n.t('player__end'))
     void playNext(true)
     // })
@@ -38,9 +37,8 @@ export default async(setting: LX.AppSetting) => {
   }
 
   const updatePic = () => {
-    if (!settingState.setting['player.isShowNotificationImage']) return
     if (playerState.playMusicInfo.musicInfo && playerState.musicInfo.pic) {
-      delayUpdateMusicInfo(playerState.musicInfo)
+      delayUpdateMusicInfo(playerState.musicInfo, playerState.lastLyric)
     }
   }
 
@@ -49,10 +47,18 @@ export default async(setting: LX.AppSetting) => {
       const newValue = settings['player.togglePlayMethod']
       if (playerState.playedList.length) clearPlayedList()
       const playMusicInfo = playerState.playMusicInfo
-      if (newValue == 'random' && playMusicInfo.musicInfo && !playMusicInfo.isTempPlay) addPlayedList({ ...(playMusicInfo as LX.Player.PlayMusicInfo) })
+      if (newValue == 'random' && playMusicInfo.musicInfo && !playMusicInfo.isTempPlay)
+        addPlayedList({ ...(playMusicInfo as LX.Player.PlayMusicInfo) })
+    }
+    if (keys.includes('desktopLyric.enable')) {
+      void updateOptions(settings['desktopLyric.enable'] as boolean).then(() => {
+        // Force notification rebuild after updating options icon
+        if (playerState.playMusicInfo.musicInfo) {
+          delayUpdateMusicInfo(playerState.musicInfo, playerState.lastLyric)
+        }
+      })
     }
   }
-
 
   global.app_event.on('play', setPlayStatus)
   global.app_event.on('pause', setPauseStatus)

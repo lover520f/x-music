@@ -1,22 +1,33 @@
 declare namespace LX {
   namespace Music {
-    interface MusicQualityType { // {"type": "128k", size: "3.56M"}
+    interface MusicQualityType {
+      // {"type": "128k", size: "3.56M"}
       type: LX.Quality
       size: string | null
     }
-    interface MusicQualityTypeKg { // {"type": "128k", size: "3.56M"}
+    interface MusicQualityTypeKg {
+      // {"type": "128k", size: "3.56M"}
       type: LX.Quality
       size: string | null
       hash: string
     }
-    type _MusicQualityType = Partial<Record<Quality, {
-      size: string | null
-    }>>
-    type _MusicQualityTypeKg = Partial<Record<Quality, {
-      size: string | null
-      hash: string
-    }>>
-
+    type _MusicQualityType = Partial<
+      Record<
+        Quality,
+        {
+          size: string | null
+        }
+      >
+    >
+    type _MusicQualityTypeKg = Partial<
+      Record<
+        Quality,
+        {
+          size: string | null
+          hash: string
+        }
+      >
+    >
 
     interface MusicInfoMetaBase {
       songId: string | number // 歌曲ID，mg源为copyrightId，local为文件路径
@@ -26,9 +37,13 @@ declare namespace LX {
     }
 
     interface MusicInfoMeta_online extends MusicInfoMetaBase {
+      fee?: number
       qualitys: MusicQualityType[]
       _qualitys: _MusicQualityType
-      albumId?: string | number // 歌曲专辑ID
+      albumId?: string | number
+      originCoverType?: number
+      _full?: boolean
+      mv?: number
     }
 
     interface MusicInfoMeta_local extends MusicInfoMetaBase {
@@ -36,13 +51,15 @@ declare namespace LX {
       ext: string
     }
 
-
     interface MusicInfoBase<S = LX.Source> {
       id: string
       name: string // 歌曲名
+      alias?: string
       singer: string // 艺术家名
+      artists?: Array<{ id: string | number; name: string }>
       source: S // 源
       interval: string | null // 格式化后的歌曲时长，例：03:55
+      releaseDate?: string | null
       meta: MusicInfoMetaBase
     }
 
@@ -50,7 +67,7 @@ declare namespace LX {
       meta: MusicInfoMeta_local
     }
 
-    interface MusicInfo_online_common extends MusicInfoBase<'kw' | 'wy'> {
+    interface MusicInfo_online_common extends MusicInfoBase<'kw' | 'wy' | 'git'> {
       meta: MusicInfoMeta_online
     }
 
@@ -110,6 +127,5 @@ declare namespace LX {
       id: string
       list: MusicInfoOnline[]
     }
-
   }
 }

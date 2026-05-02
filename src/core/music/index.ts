@@ -1,7 +1,3 @@
-// if (targetSong.key) { // 如果是已下载的歌曲
-//   const filePath = path.join(appSetting['download.savePath'], targetSong.metadata.fileName)
-//   // console.log(filePath)
-
 import {
   getMusicUrl as getOnlineMusicUrl,
   getPicUrl as getOnlinePicUrl,
@@ -18,8 +14,7 @@ import {
   getLyricInfo as getLocalLyricInfo,
 } from './local'
 
-
-export const getMusicUrl = async({
+export const getMusicUrl = async ({
   musicInfo,
   quality,
   isRefresh = false,
@@ -41,7 +36,7 @@ export const getMusicUrl = async({
   }
 }
 
-export const getPicPath = async({
+export const getPicPath = async ({
   musicInfo,
   isRefresh = false,
   listId,
@@ -61,7 +56,7 @@ export const getPicPath = async({
   }
 }
 
-export const getLyricInfo = async({
+export const getLyricInfo = async ({
   musicInfo,
   isRefresh = false,
   onToggleSource,

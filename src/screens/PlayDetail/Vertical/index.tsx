@@ -1,9 +1,10 @@
-import { memo, useState, useRef, useMemo, useEffect } from 'react'
+import {memo, useState, useRef, useMemo, useEffect, useCallback} from 'react'
 import { View, AppState } from 'react-native'
 
 import Header from './components/Header'
 // import Aside from './components/Aside'
 // import Main from './components/Main'
+import MiniLyric from '../components/MiniLyric';
 import Player from './Player'
 import PagerView, { type PagerViewOnPageSelectedEvent } from 'react-native-pager-view'
 import Pic from './Pic'
@@ -31,6 +32,7 @@ const LyricPage = ({ activeIndex }: { activeIndex: number }) => {
 export default memo(({ componentId }: { componentId: string }) => {
   // const theme = useTheme()
   const [pageIndex, setPageIndex] = useState(0)
+  const pagerViewRef = useRef<PagerView>(null);
   const showLyricRef = useRef(false)
 
   const onPageSelected = ({ nativeEvent }: PagerViewOnPageSelectedEvent) => {
@@ -42,6 +44,10 @@ export default memo(({ componentId }: { componentId: string }) => {
       screenUnkeepAwake()
     }
   }
+
+  const handleSwitchToLyricPage = useCallback(() => {
+    pagerViewRef.current?.setPage(1);
+  }, []);
 
   useEffect(() => {
     let appstateListener = AppState.addEventListener('change', (state) => {
@@ -67,7 +73,6 @@ export default memo(({ componentId }: { componentId: string }) => {
       appstateListener.remove()
       screenUnkeepAwake()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -78,9 +83,16 @@ export default memo(({ componentId }: { componentId: string }) => {
           onPageSelected={onPageSelected}
           // onPageScrollStateChanged={onPageScrollStateChanged}
           style={styles.pagerView}
+          ref={pagerViewRef}
         >
           <View collapsable={false}>
-            <Pic componentId={componentId} />
+            <View collapsable={false} style={styles.picPageContainer}>
+              <Pic componentId={componentId} />
+              <MiniLyric
+                onPress={handleSwitchToLyricPage}
+                style={styles.miniLyricContainer}
+              />
+            </View>
           </View>
           <View collapsable={false}>
             <LyricPage activeIndex={pageIndex} />
@@ -90,7 +102,7 @@ export default memo(({ componentId }: { componentId: string }) => {
           <View style={{ ...styles.pageIndicatorItem, backgroundColor: pageIndex == 0 ? theme['c-primary-light-100-alpha-700'] : theme['c-primary-alpha-900'] }}></View>
           <View style={{ ...styles.pageIndicatorItem, backgroundColor: pageIndex == 1 ? theme['c-primary-light-100-alpha-700'] : theme['c-primary-alpha-900'] }}></View>
         </View> */}
-        <Player />
+        <Player componentId={componentId} />
       </View>
     </>
   )
@@ -103,6 +115,18 @@ const styles = createStyle({
   },
   pagerView: {
     flex: 1,
+  },
+  picPageContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  miniLyricContainer: {
+    position: 'absolute',
+    bottom: '6%',
+    left: '10%',
+    right: '10%',
+    alignItems: 'flex-start',
   },
   // pageIndicator: {
   //   flex: 0,

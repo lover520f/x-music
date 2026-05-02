@@ -5,11 +5,12 @@ import {
   HOME_SCREEN,
   PLAY_DETAIL_SCREEN,
   SONGLIST_DETAIL_SCREEN,
-  COMMENT_SCREEN,
-  // SETTING_SCREEN,
+  SIMILAR_SONGS_SCREEN,
+  COMMENT_SCREEN, ARTIST_DETAIL_SCREEN, ALBUM_DETAIL_SCREEN, DOWNLOAD_MANAGER_SCREEN,
 } from './screenNames'
 
 import themeState from '@/store/theme/state'
+import playerState from '@/store/player/state'
 import { NAV_SHEAR_NATIVE_IDS } from '@/config/constant'
 import { getStatusBarStyle } from './utils'
 import { windowSizeTools } from '@/utils/windowSizeTools'
@@ -56,31 +57,33 @@ export async function pushHomeScreen() {
   return Navigation.setRoot({
     root: {
       stack: {
-        children: [{
-          component: {
-            name: HOME_SCREEN,
-            options: {
-              topBar: {
-                visible: false,
-                height: 0,
-                drawBehind: false,
-              },
-              statusBar: {
-                drawBehind: true,
-                visible: true,
-                style: getStatusBarStyle(theme.isDark),
-                backgroundColor: 'transparent',
-              },
-              navigationBar: {
-                // visible: false,
-                backgroundColor: theme['c-content-background'],
-              },
-              layout: {
-                componentBackgroundColor: theme['c-content-background'],
+        children: [
+          {
+            component: {
+              name: HOME_SCREEN,
+              options: {
+                topBar: {
+                  visible: false,
+                  height: 0,
+                  drawBehind: false,
+                },
+                statusBar: {
+                  drawBehind: true,
+                  visible: true,
+                  style: getStatusBarStyle(theme.isDark),
+                  backgroundColor: 'transparent',
+                },
+                navigationBar: {
+                  // visible: false,
+                  backgroundColor: theme['c-content-background'],
+                },
+                layout: {
+                  componentBackgroundColor: theme['c-content-background'],
+                },
               },
             },
           },
-        }],
+        ],
       },
     },
   })
@@ -120,6 +123,7 @@ export function pushPlayDetailScreen(componentId: string, skipAnimation = false)
   */
   requestAnimationFrame(() => {
     const theme = themeState.theme
+    const hasPic = !!playerState.musicInfo.pic
 
     void Navigation.push(componentId, {
       component: {
@@ -144,46 +148,50 @@ export function pushPlayDetailScreen(componentId: string, skipAnimation = false)
             componentBackgroundColor: theme['c-content-background'],
           },
           animations: {
-            push: skipAnimation ? {} : {
-              sharedElementTransitions: [
-                {
-                  fromId: NAV_SHEAR_NATIVE_IDS.playDetail_pic,
-                  toId: NAV_SHEAR_NATIVE_IDS.playDetail_pic,
-                  interpolation: { type: 'spring' },
+            push: skipAnimation
+              ? {}
+              : hasPic ? {
+                sharedElementTransitions: [
+                  {
+                    fromId: NAV_SHEAR_NATIVE_IDS.playDetail_pic,
+                    toId: NAV_SHEAR_NATIVE_IDS.playDetail_pic,
+                    interpolation: { type: 'spring' },
+                  },
+                ],
+                elementTransitions: [
+                  {
+                    id: NAV_SHEAR_NATIVE_IDS.playDetail_header,
+                    alpha: {
+                      from: 0,
+                      duration: 300,
+                    },
+                    translationY: {
+                      from: -32,
+                      duration: 300,
+                    },
+                  },
+                  {
+                    id: NAV_SHEAR_NATIVE_IDS.playDetail_player,
+                    alpha: {
+                      from: 0,
+                      duration: 300,
+                    },
+                    translationY: {
+                      from: 32,
+                      duration: 300,
+                    },
+                  },
+                ],
+              }
+              : {
+                content: {
+                  translationX: {
+                    from: windowSizeTools.getSize().width,
+                    to: 0,
+                    duration: 300,
+                  },
                 },
-              ],
-              elementTransitions: [
-                {
-                  id: NAV_SHEAR_NATIVE_IDS.playDetail_header,
-                  alpha: {
-                    from: 0, // We don't declare 'to' value as that is the element's current alpha value, here we're essentially animating from 0 to 1
-                    duration: 300,
-                  },
-                  translationY: {
-                    from: -32, // Animate translationY from 16dp to 0dp
-                    duration: 300,
-                  },
-                },
-                {
-                  id: NAV_SHEAR_NATIVE_IDS.playDetail_player,
-                  alpha: {
-                    from: 0, // We don't declare 'to' value as that is the element's current alpha value, here we're essentially animating from 0 to 1
-                    duration: 300,
-                  },
-                  translationY: {
-                    from: 32, // Animate translationY from 16dp to 0dp
-                    duration: 300,
-                  },
-                },
-              ],
-              // content: {
-              //   translationX: {
-              //     from: windowSizeTools.getSize().width,
-              //     to: 0,
-              //     duration: 300,
-              //   },
-              // },
-            },
+              },
             pop: {
               content: {
                 translationX: {
@@ -588,3 +596,190 @@ export function pushTabBasedApp() {
   })
 }
  */
+export function pushArtistDetailScreen(componentId: string, artistInfo: { id: string, name: string }) {
+  const theme = themeState.theme
+  return Navigation.push(componentId, {
+    component: {
+      name: ARTIST_DETAIL_SCREEN,
+      passProps: {
+        artistInfo,
+      },
+      options: {
+        topBar: {
+          visible: false,
+          height: 0,
+        },
+        statusBar: {
+          drawBehind: true,
+          visible: true,
+          style: getStatusBarStyle(theme.isDark),
+          backgroundColor: 'transparent',
+        },
+        layout: {
+          componentBackgroundColor: theme['c-content-background'],
+        },
+        animations: {
+          push: {
+            content: {
+              translationX: {
+                from: windowSizeTools.getSize().width,
+                to: 0,
+                duration: 200,
+              },
+            },
+          },
+          pop: {
+            content: {
+              translationX: {
+                from: 0,
+                to: windowSizeTools.getSize().width,
+                duration: 200,
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
+export function pushAlbumDetailScreen(componentId: string, albumInfo: any) {
+  const theme = themeState.theme
+  return Navigation.push(componentId, {
+    component: {
+      name: ALBUM_DETAIL_SCREEN,
+      passProps: {
+        albumInfo,
+      },
+      options: {
+        topBar: {
+          visible: false,
+          height: 0,
+        },
+        statusBar: {
+          drawBehind: true,
+          visible: true,
+          style: getStatusBarStyle(theme.isDark),
+          backgroundColor: 'transparent',
+        },
+        layout: {
+          componentBackgroundColor: theme['c-content-background'],
+        },
+        animations: {
+          push: {
+            content: {
+              translationX: {
+                from: windowSizeTools.getSize().width,
+                to: 0,
+                duration: 200,
+              },
+            },
+          },
+          pop: {
+            content: {
+              translationX: {
+                from: 0,
+                to: windowSizeTools.getSize().width,
+                duration: 200,
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
+
+export function pushDownloadManagerScreen(componentId: string) {
+  const theme = themeState.theme;
+  return Navigation.push(componentId, {
+    component: {
+      name: DOWNLOAD_MANAGER_SCREEN,
+      options: {
+        topBar: {
+          visible: false,
+          height: 0,
+        },
+        statusBar: {
+          drawBehind: true,
+          visible: true,
+          style: getStatusBarStyle(theme.isDark),
+          backgroundColor: 'transparent',
+        },
+        layout: {
+          componentBackgroundColor: theme['c-content-background'],
+        },
+        animations: {
+          push: {
+            content: {
+              translationX: {
+                from: windowSizeTools.getSize().width,
+                to: 0,
+                duration: 200,
+              },
+            },
+          },
+          pop: {
+            content: {
+              translationX: {
+                from: 0,
+                to: windowSizeTools.getSize().width,
+                duration: 200,
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
+
+
+export function pushSimilarSongsScreen(componentId: string, similarSongs: LX.Music.MusicInfoOnline[]) {
+  const theme = themeState.theme
+  return Navigation.push(componentId, {
+    component: {
+      name: SIMILAR_SONGS_SCREEN,
+      passProps: {
+        similarSongs,
+      },
+      options: {
+        topBar: {
+          visible: false,
+          height: 0,
+        },
+        statusBar: {
+          drawBehind: true,
+          visible: true,
+          style: getStatusBarStyle(theme.isDark),
+          backgroundColor: 'transparent',
+        },
+        layout: {
+          componentBackgroundColor: theme['c-content-background'],
+        },
+        animations: {
+          push: {
+            content: {
+              translationX: {
+                from: windowSizeTools.getSize().width,
+                to: 0,
+                duration: 200,
+              },
+            },
+          },
+          pop: {
+            content: {
+              translationX: {
+                from: 0,
+                to: windowSizeTools.getSize().width,
+                duration: 200,
+              },
+            },
+          },
+        },
+      },
+    },
+  })
+}

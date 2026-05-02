@@ -9,49 +9,71 @@ import playerState from '@/store/player/state'
 import settingState from '@/store/setting/state'
 import { onScreenStateChange } from '@/utils/nativeModules/utils'
 import { AppState } from 'react-native'
+import { updateScrobblePlayTime, updateScrobbleTotalTime } from '@/core/player/scrobble'
+import { LIST_IDS } from "@/config/constant.ts"
+import listState from '@/store/list/state'
 
 const delaySavePlayInfo = throttleBackgroundTimer(() => {
-  void savePlayInfo({
+  const listIdToSave = playerState.playMusicInfo.listId
+  const playInfoToSave: LX.Player.SavedPlayInfo = {
     time: playerState.progress.nowPlayTime,
     maxTime: playerState.progress.maxPlayTime,
-    listId: playerState.playMusicInfo.listId!,
+    listId: listIdToSave!,
     index: playerState.playInfo.playIndex,
-  })
+  }
+
+  // 如果当前播放的是临时列表，则附加其元数据
+  if (listIdToSave === LIST_IDS.TEMP) {
+    playInfoToSave.tempMeta = listState.tempListMeta
+  }
+
+  void savePlayInfo(playInfoToSave)
 }, 2000)
 
 export default () => {
   // const updateMusicInfo = useCommit('list', 'updateMusicInfo')
 
   let updateTimeout: number | null = null
-
   let isScreenOn = true
 
   const getCurrentTime = () => {
     let id = playerState.musicInfo.id
-    void getPosition().then(position => {
+    void getPosition().then((position) => {
       if (!position || id != playerState.musicInfo.id) return
       setNowPlayTime(position)
-      if (!playerState.isPlay) return
+      updateScrobblePlayTime(position) // 实时更新打点记录的播放时间
 
-      if (settingState.setting['player.isSavePlayTime'] && !playerState.playMusicInfo.isTempPlay && isScreenOn) {
+      if (!playerState.isPlay) return
+      if (
+        settingState.setting['player.isSavePlayTime'] &&
+        !playerState.playMusicInfo.isTempPlay &&
+        isScreenOn
+      ) {
         delaySavePlayInfo()
       }
     })
   }
-  const getMaxTime = async() => {
-    setMaxplayTime(await getDuration())
 
-    if (playerState.playMusicInfo.musicInfo && 'source' in playerState.playMusicInfo.musicInfo && !playerState.playMusicInfo.musicInfo.interval) {
-      // console.log(formatPlayTime2(playProgress.maxPlayTime))
+  const getMaxTime = async () => {
+    const duration = await getDuration()
+    setMaxplayTime(duration)
+    updateScrobbleTotalTime(duration)
 
+    if (
+      playerState.playMusicInfo.musicInfo &&
+      'source' in playerState.playMusicInfo.musicInfo &&
+      !playerState.playMusicInfo.musicInfo.interval
+    ) {
       if (playerState.playMusicInfo.listId) {
-        void updateListMusics([{
-          id: playerState.playMusicInfo.listId,
-          musicInfo: {
-            ...playerState.playMusicInfo.musicInfo,
-            interval: formatPlayTime2(playerState.progress.maxPlayTime),
+        void updateListMusics([
+          {
+            id: playerState.playMusicInfo.listId,
+            musicInfo: {
+              ...playerState.playMusicInfo.musicInfo,
+              interval: formatPlayTime2(playerState.progress.maxPlayTime),
+            },
           },
-        }])
+        ])
       }
     }
   }
@@ -61,6 +83,7 @@ export default () => {
     BackgroundTimer.clearInterval(updateTimeout)
     updateTimeout = null
   }
+
   const startUpdateTimeout = () => {
     if (!isScreenOn) return
     clearUpdateTimeout()
@@ -72,15 +95,14 @@ export default () => {
 
   const setProgress = (time: number, maxTime?: number) => {
     if (!playerState.musicInfo.id) return
-    // console.log('setProgress', time, maxTime)
     setNowPlayTime(time)
+    updateScrobblePlayTime(time)
     void setCurrentTime(time)
-
-    if (maxTime != null) setMaxplayTime(maxTime)
-
-    // if (!isPlay) audio.play()
+    if (maxTime != null) {
+      setMaxplayTime(maxTime)
+      updateScrobbleTotalTime(maxTime)
+    }
   }
-
 
   const handlePlay = () => {
     void getMaxTime()
@@ -88,6 +110,7 @@ export default () => {
     // handleSetTaskBarState(playProgress.progress, prevProgressStatus)
     startUpdateTimeout()
   }
+
   const handlePause = () => {
     // prevProgressStatus = 'paused'
     // handleSetTaskBarState(playProgress.progress, prevProgressStatus)
@@ -111,19 +134,27 @@ export default () => {
     clearUpdateTimeout()
   }
 
-
   const handleSetPlayInfo = () => {
     // restorePlayTime = playProgress.nowPlayTime
     // void setCurrentTime(playerState.progress.nowPlayTime)
     // setMaxplayTime(playProgress.maxPlayTime)
     handlePause()
     if (!playerState.playMusicInfo.isTempPlay) {
-      void savePlayInfo({
+      const playMusicInfo = playerState.playMusicInfo;
+      if (!playMusicInfo.listId) return
+
+      const playInfoToSave: LX.Player.SavedPlayInfo = {
         time: playerState.progress.nowPlayTime,
         maxTime: playerState.progress.maxPlayTime,
-        listId: playerState.playMusicInfo.listId!,
+        listId: playMusicInfo.listId,
         index: playerState.playInfo.playIndex,
-      })
+      }
+
+      if (playMusicInfo.listId === LIST_IDS.TEMP) {
+        playInfoToSave.tempMeta = listState.tempListMeta
+      }
+
+      void savePlayInfo(playInfoToSave)
     }
   }
 
@@ -176,6 +207,5 @@ export default () => {
   // global.app_event.on('playerEmptied', handleEmpied)
   global.app_event.on('musicToggled', handleSetPlayInfo)
   global.state_event.on('configUpdated', handleConfigUpdated)
-
   onScreenStateChange(handleScreenStateChanged)
 }

@@ -35,7 +35,8 @@ export declare interface ListInfoItem {
   // grade: basic.favorcnt / 10,
   desc?: string
   source: LX.OnlineSource
-  total?: string
+  total?: string | number
+  userId?: string | number
 }
 export declare interface ListInfo {
   list: ListInfoItem[]
@@ -65,6 +66,7 @@ export declare interface ListDetailInfo {
     desc?: string
     author?: string
     play_count?: string
+    userId?: string | number
   }
 }
 
@@ -81,7 +83,6 @@ export interface InitState {
   listInfo: ListInfo
   listDetailInfo: ListDetailInfo
 }
-
 
 const state: InitState = {
   sources: [],
@@ -112,7 +113,6 @@ const state: InitState = {
   },
 }
 
-
 for (const source of music.sources) {
   const songList = music[source.id as Source]?.songList
   if (!songList) continue
@@ -120,6 +120,4 @@ for (const source of music.sources) {
   state.sortList[source.id as Source] = songList.sortList as SortInfo[]
 }
 
-
 export default state
-

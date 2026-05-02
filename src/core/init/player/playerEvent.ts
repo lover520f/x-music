@@ -5,16 +5,15 @@ import { isActive } from '@/utils/tools'
 import BackgroundTimer from 'react-native-background-timer'
 import playerState from '@/store/player/state'
 import { setNowPlayTime } from '@/core/player/progress'
-
+import { updateScrobbleInfo } from '@/core/player/scrobble' // [修改] 从新模块导入
 
 export default () => {
   let retryNum = 0
   let prevTimeoutId: string | null = null
-
   let loadingTimeout: number | null = null
   let delayNextTimeout: number | null = null
+
   const startLoadingTimeout = () => {
-    // console.log('start load timeout')
     clearLoadingTimeout()
     loadingTimeout = BackgroundTimer.setTimeout(() => {
       // if (global.lx.isPlayedStop) {
@@ -29,23 +28,24 @@ export default () => {
         void playNext(true)
       } else {
         prevTimeoutId = playerState.musicInfo.id
-        if (playerState.playMusicInfo.musicInfo) setMusicUrl(playerState.playMusicInfo.musicInfo, true)
+        if (playerState.playMusicInfo.musicInfo)
+          setMusicUrl(playerState.playMusicInfo.musicInfo, true)
       }
     }, 25000)
   }
+
   const clearLoadingTimeout = () => {
     if (!loadingTimeout) return
-    // console.log('clear load timeout')
     BackgroundTimer.clearTimeout(loadingTimeout)
     loadingTimeout = null
   }
 
   const clearDelayNextTimeout = () => {
-    // console.log(this.delayNextTimeout)
     if (!delayNextTimeout) return
     BackgroundTimer.clearTimeout(delayNextTimeout)
     delayNextTimeout = null
   }
+
   const addDelayNextTimeout = () => {
     clearDelayNextTimeout()
     delayNextTimeout = BackgroundTimer.setTimeout(() => {
@@ -90,28 +90,34 @@ export default () => {
     if (!playerState.musicInfo.id) return
     clearLoadingTimeout()
     if (global.lx.isPlayedStop) return
-    if (playerState.playMusicInfo.musicInfo && retryNum < 2) { // 若音频URL无效则尝试刷新2次URL
+    if (playerState.playMusicInfo.musicInfo && retryNum < 2) {
+      // 若音频URL无效则尝试刷新2次URL
       let musicInfo = playerState.playMusicInfo.musicInfo
-      void getPosition().then((position) => {
-        if (position) setNowPlayTime(position)
-      }).finally(() => {
-        // console.log(this.retryNum)
-        if (playerState.playMusicInfo.musicInfo !== musicInfo) return
-        retryNum++
-        setMusicUrl(playerState.playMusicInfo.musicInfo, true)
-        setStatusText(global.i18n.t('player__refresh_url'))
-      })
+      void getPosition()
+        .then((position) => {
+          if (position) setNowPlayTime(position)
+        })
+        .finally(() => {
+          if (playerState.playMusicInfo.musicInfo !== musicInfo) return
+          retryNum++
+          setMusicUrl(playerState.playMusicInfo.musicInfo, true)
+          setStatusText(global.i18n.t('player__refresh_url'))
+        })
       return
     }
+
+    global.lx.playerError = true
     if (!isEmpty()) void setStop()
 
-    if (isActive()) {
-      setStatusText(global.i18n.t('player__error'))
-      setTimeout(addDelayNextTimeout)
-    } else {
-      console.warn('error skip to next')
-      void playNext(true)
-    }
+    // 设置错误状态文本，但不自动播放下一首
+    setStatusText(global.i18n.t('player__error'))
+    // if (isActive()) {
+    //   setStatusText(global.i18n.t('player__error'))
+    //   setTimeout(addDelayNextTimeout)
+    // } else {
+    //   console.warn('error skip to next')
+    //   void playNext(true)
+    // }
   }
 
   const handleSetPlayInfo = () => {
@@ -119,13 +125,11 @@ export default () => {
     prevTimeoutId = null
     clearDelayNextTimeout()
     clearLoadingTimeout()
+    updateScrobbleInfo()
   }
 
-  // const handlePlayedStop = () => {
-  //   clearDelayNextTimeout()
-  //   clearLoadingTimeout()
-  // }
-
+  const handleStop = () => {
+  }
 
   global.app_event.on('playerLoadstart', handleLoadstart)
   // global.app_event.on('playerLoadeddata', handleLoadeddata)
@@ -135,4 +139,5 @@ export default () => {
   global.app_event.on('playerEmptied', handleEmpied)
   global.app_event.on('playerError', handleError)
   global.app_event.on('musicToggled', handleSetPlayInfo)
+  global.app_event.on('stop', handleStop)
 }

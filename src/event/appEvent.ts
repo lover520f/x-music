@@ -3,7 +3,14 @@ import Event from './Event'
 import commonState from '@/store/common/state'
 import { type Source as SonglistSource } from '@/store/songlist/state'
 import { type SearchType } from '@/store/search/state'
-
+import DownloadTask = LX.Download.DownloadTask
+import playerState from '@/store/player/state'
+import listState from '@/store/list/state'
+import userState from '@/store/user/state'
+import {COMPONENT_IDS, LIST_IDS, type NAV_ID_Type} from '@/config/constant'
+import {navigations} from "@/navigation";
+import {getDailyRecCache} from "@/utils/data.ts";
+import {toast} from "@/utils/tools.ts";
 
 // {
 //   // sync: {
@@ -26,7 +33,9 @@ export class AppEvent extends Event {
   /**
    * 我的列表更新
    */
-  mylistUpdated(lists: Array<LX.List.MyDefaultListInfo | LX.List.MyLoveListInfo | LX.List.UserListInfo>) {
+  mylistUpdated(
+    lists: Array<LX.List.MyDefaultListInfo | LX.List.MyLoveListInfo | LX.List.UserListInfo>,
+  ) {
     this.emit('mylistUpdated', lists)
   }
 
@@ -126,7 +135,6 @@ export class AppEvent extends Event {
     this.emit('playerWaiting')
   }
 
-
   // 更新图片事件
   picUpdated() {
     this.emit('picUpdated')
@@ -170,16 +178,80 @@ export class AppEvent extends Event {
     this.emit('searchTypeChanged', type)
   }
 
-  jumpListPosition() {
-    if (commonState.navActiveId == 'nav_love') {
-      this.emit('jumpListPosition')
-    } else {
-      global.lx.jumpMyListPosition = true
-      setNavActiveId('nav_love')
-      setTimeout(() => {
+  async jumpListPosition() {
+    const playMusicInfo = playerState.playMusicInfo
+    let listId = playMusicInfo.listId
+    const musicInfo = 'progress' in playMusicInfo.musicInfo ? playMusicInfo.musicInfo.metadata.musicInfo : playMusicInfo.musicInfo
+
+    if (!listId || !musicInfo) {
+      if (commonState.navActiveId === 'nav_love') {
         this.emit('jumpListPosition')
-      }, 200)
+      } else {
+        setNavActiveId('nav_love')
+        setTimeout(() => this.emit('jumpListPosition'), 200)
+      }
+      return
     }
+
+    if (listId === LIST_IDS.TEMP) {
+      listId = listState.tempListMeta.id
+    }
+
+    const currentComponentId = commonState.componentIds[commonState.componentIds.length - 1]?.id
+    if (!currentComponentId) return
+
+    let navigatedToDetail = false
+    const currentComponent = commonState.componentIds[commonState.componentIds.length - 1];
+
+    if (listId.startsWith('artist_detail_')) {
+      const artistId = listId.replace('artist_detail_', '')
+      console.log(currentComponent?.name)
+      if (currentComponent?.name !== COMPONENT_IDS.ARTIST_DETAIL) {
+        navigations.pushArtistDetailScreen(currentComponentId, { id: artistId, name: musicInfo.singer })
+        navigatedToDetail = true
+      }
+    } else if (listId.startsWith('album_')) {
+      const albumId = listId.replace('album_', '')
+      if (currentComponent?.name !== COMPONENT_IDS.ALBUM_DETAIL_SCREEN) {
+        navigations.pushAlbumDetailScreen(currentComponentId, { id: albumId, name: musicInfo.meta.albumName, source: musicInfo.source as LX.OnlineSource })
+        navigatedToDetail = true
+      }
+    } else if (listId.includes('__')) { // 处理歌单和排行榜
+      const [source, sourceId] = listId.split('__')
+      const isSubscribed = userState.wy_subscribed_playlists.some(p => String(p.id) === sourceId)
+      const targetNavId: NAV_ID_Type = isSubscribed ? 'nav_my_playlist' : 'nav_songlist'
+
+      if (commonState.navActiveId !== targetNavId) {
+        global.lx.jumpMyListPosition = true
+        setNavActiveId(targetNavId)
+      }
+    } else if (listId.startsWith('dailyrec_wy')) {
+      // 每日推荐，切换到对应 tab
+      setNavActiveId('nav_daily_rec')
+    } else if (listId === 'similar_songs_list') {
+      if (currentComponent?.name !== COMPONENT_IDS.SIMILAR_SONGS_SCREEN) {
+        const cache = await getDailyRecCache();
+        const allSimilarSongs = cache?.items.flatMap(item => item.similarSongs) ?? [];
+        if (allSimilarSongs.length === 0) {
+          toast('找不到相似歌曲列表');
+          return;
+        }
+        const uniqueSongs = Array.from(new Map(allSimilarSongs.map(song => [song.id, song])).values());
+        navigations.pushSimilarSongsScreen(currentComponentId, uniqueSongs);
+        navigatedToDetail = true;
+      }
+    } else {
+      // 默认处理“我的列表”
+      const targetNavId: NAV_ID_Type = 'nav_love'
+      if (commonState.navActiveId !== targetNavId) {
+        global.lx.jumpMyListPosition = true
+        setNavActiveId(targetNavId)
+      }
+    }
+
+    setTimeout(() => {
+      this.emit('jumpListPosition')
+    }, navigatedToDetail ? 500 : 200) // PUSH 页面需要更长延时等待动画
   }
 
   changeLoveListVisible(visible: boolean) {
@@ -201,11 +273,42 @@ export class AppEvent extends Event {
   selectSyncMode(mode: LX.Sync.ModeType) {
     this.emit('selectSyncMode', mode)
   }
+
+  showArtistSelector(artists: any[], onSelect: (artist: any) => void) {
+    this.emit('showArtistSelector', artists, onSelect)
+  }
+
+  triggerSearch(text: string) {
+    this.emit('triggerSearch', text)
+  }
+
+  download_list_changed() {
+    this.emit('download_list_changed')
+  }
+  download_task_add(task: DownloadTask) {
+    this.emit('download_task_add', task)
+  }
+  download_progress_update(payload: { id: string, progress: DownloadTask['progress'] }) {
+    this.emit('download_progress_update', payload)
+  }
+  download_status_update(payload: { id: string, status: DownloadTask['status'] }) {
+    this.emit('download_status_update', payload)
+  }
+  download_metadata_update(payload: { id: string, metadataStatus: DownloadTask['metadataStatus'] }) {
+    this.emit('download_metadata_update', payload)
+  }
+  show_download_ball() {
+    this.emit('show_download_ball')
+  }
+  showVideoPlayer(url: string) {
+    this.emit('showVideoPlayer', url)
+  }
+  playlist_updated(data: { source: string, listId: string }) {
+    this.emit('playlist_updated', data)
+  }
 }
 
-
 type EventMethods = Omit<EventType, keyof Event>
-
 
 declare class EventType extends AppEvent {
   on<K extends keyof EventMethods>(event: K, listener: EventMethods[K]): any

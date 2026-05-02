@@ -1,4 +1,3 @@
-/* eslint-disable no-var */
 import type { AppEventTypes } from '@/event/appEvent'
 import type { ListEventTypes } from '@/event/listEvent'
 import type { DislikeEventTypes } from '@/event/dislikeEvent'
@@ -18,7 +17,9 @@ import type { SettingScreenIds } from '@/screens/Home/Views/Setting'
 interface GlobalData {
   fontSize: number
   gettingUrlId: string
+  isCarMode: boolean
 
+  playerError: boolean;
   // event_app: AppType
   // event_list: ListType
 
@@ -58,13 +59,23 @@ interface GlobalData {
 
   // syncKeyInfo: LX.Sync.KeyInfo
 }
-
-
+interface Artist {
+  id: string | number;
+  name: string;
+}
 declare global {
   var isDev: boolean
   var lx: GlobalData
   var i18n: I18n
-  var app_event: AppEventTypes
+  var app_event: AppEventTypes & {
+    showArtistSelector: (artists: Artist[], onSelect: (artist: Artist) => void) => void;
+    triggerSearch: (text: string) => void;
+    'wy-cookie-set': (cookie: string) => void
+    'yt-cookie-set': (cookie: string) => void
+    showWebLogin: () => void
+    showYouTubeLogin: () => void
+    showVideoPlayer: (url: string) => void
+  }
   var list_event: ListEventTypes
   var dislike_event: DislikeEventTypes
   var state_event: StateEventTypes

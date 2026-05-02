@@ -5,6 +5,7 @@ import Player from './settings/Player'
 import LyricDesktop from './settings/LyricDesktop'
 import Search from './settings/Search'
 import List from './settings/List'
+import Download from './settings/Download'
 import Sync from './settings/Sync'
 import Backup from './settings/Backup'
 import Other from './settings/Other'
@@ -15,8 +16,9 @@ export const SETTING_SCREENS = [
   'basic',
   'player',
   'lyric_desktop',
-  'search',
+  // 'search',
   'list',
+  'download',
   'sync',
   'backup',
   'other',
@@ -24,7 +26,7 @@ export const SETTING_SCREENS = [
   'about',
 ] as const
 
-export type SettingScreenIds = typeof SETTING_SCREENS[number]
+export type SettingScreenIds = (typeof SETTING_SCREENS)[number]
 
 // interface MainProps {
 //   onUpdateActiveId: (id: string) => void
@@ -48,23 +50,33 @@ const Main = forwardRef<MainType, {}>((props, ref) => {
 
   const component = useMemo(() => {
     switch (id) {
-      case 'player': return <Player />
-      case 'lyric_desktop': return <LyricDesktop />
-      case 'search': return <Search />
-      case 'list': return <List />
-      case 'sync': return <Sync />
-      case 'backup': return <Backup />
-      case 'other': return <Other />
-      case 'version': return <Version />
-      case 'about': return <About />
+      case 'player':
+        return <Player />
+      case 'lyric_desktop':
+        return <LyricDesktop />
+      case 'search':
+        return <Search />
+      case 'list':
+        return <List />
+      case 'download':
+        return <Download />
+      case 'sync':
+        return <Sync />
+      case 'backup':
+        return <Backup />
+      case 'other':
+        return <Other />
+      case 'version':
+        return <Version />
+      case 'about':
+        return <About />
       case 'basic':
-      default: return <Basic />
+      default:
+        return <Basic />
     }
   }, [id])
 
   return component
 })
 
-
 export default Main
-

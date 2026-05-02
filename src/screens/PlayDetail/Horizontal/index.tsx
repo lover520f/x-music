@@ -3,7 +3,6 @@ import { View, AppState } from 'react-native'
 import { screenkeepAwake, screenUnkeepAwake } from '@/utils/nativeModules/utils'
 import StatusBar from '@/components/common/StatusBar'
 import MoreBtn from './MoreBtn'
-
 import Header from './components/Header'
 import { setComponentId } from '@/core/common'
 import { COMPONENT_IDS } from '@/config/constant'
@@ -48,7 +47,6 @@ export default memo(({ componentId }: { componentId: string }) => {
       appstateListener.remove()
       screenUnkeepAwake()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -87,12 +85,17 @@ const styles = createStyle({
     // backgroundColor: 'rgba(0,0,0,0.1)',
   },
   leftContent: {
-    flexShrink: 1,
-    flexGrow: 0,
+    flex: 1,
     marginLeft: marginLeftRaw,
-    // flexDirection: 'row',
-    // backgroundColor: 'rgba(0,0,0,0.1)',
-    // alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  miniLyricContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
   },
   right: {
     width: '55%',

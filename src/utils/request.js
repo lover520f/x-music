@@ -4,13 +4,15 @@ import BackgroundTimer from 'react-native-background-timer'
 import { requestMsg } from './message'
 import { bHh } from './musicSdk/options'
 import { deflateRaw } from 'pako'
+import settingState from '@/store/setting/state'
+import {toast} from "@/utils/tools";
 
 const defaultHeaders = {
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
 }
 // var proxyUrl = "http://" + user + ":" + password + "@" + host + ":" + port;
 // var proxiedRequest = request.defaults({'proxy': proxyUrl});
-
 
 /**
  * 请求超时自动重试
@@ -20,7 +22,7 @@ const defaultHeaders = {
 export const httpFetch = (url, options = { method: 'get' }) => {
   const requestObj = fetchData(url, options)
   return {
-    promise: requestObj.request.catch(err => {
+    promise: requestObj.request.catch((err) => {
       console.log('出错', err.message)
       switch (err.message) {
         case 'socket hang up':
@@ -52,12 +54,14 @@ export const httpGet = (url, options, callback) => {
     options = {}
   }
   const requestObj = fetchData(url, { ...options, method: 'get' })
-  requestObj.request.then(resp => {
-    callback(null, resp, resp.body)
-  }).catch(err => {
-    // debugRequest && console.log(JSON.stringify(err))
-    callback(err, null, null)
-  })
+  requestObj.request
+    .then((resp) => {
+      callback(null, resp, resp.body)
+    })
+    .catch((err) => {
+      // debugRequest && console.log(JSON.stringify(err))
+      callback(err, null, null)
+    })
 
   return () => {
     requestObj.abort()
@@ -85,28 +89,31 @@ const fetchWithTimeout = (resource, options) => {
   }
 } */
 
-
-const handleDeflateRaw = data => new Promise((resolve, reject) => {
-  resolve(Buffer.from(deflateRaw(data)))
-  // deflateRaw(data, (err, buf) => {
-  //   if (err) return reject(err)
-  //   resolve(buf)
-  // })
-})
+const handleDeflateRaw = (data) =>
+  new Promise((resolve, reject) => {
+    resolve(Buffer.from(deflateRaw(data)))
+    // deflateRaw(data, (err, buf) => {
+    //   if (err) return reject(err)
+    //   resolve(buf)
+    // })
+  })
 
 const regx = /(?:\d\w)+/g
 
-const handleRequestData = async(url, {
-  method = 'get',
-  headers = {},
-  format = 'json',
-  cache = 'no-store',
-  ...options
-}) => {
+const handleRequestData = async (
+  url,
+  { method = 'get', headers = {}, format = 'json', cache = 'no-store', ...options }
+) => {
   // console.log(url, options)
-  headers = Object.assign({
-    Accept: 'application/json',
-  }, headers)
+  headers = Object.assign(
+    {
+      Accept: 'application/json',
+    },
+    headers
+  )
+  if (url.includes('music.163.com')) {
+    headers.cookie = settingState.setting['common.wy_cookie']
+  }
   options.cache = cache
   if (method.toLocaleLowerCase() === 'post' && !headers['Content-Type']) {
     if (options.form) {
@@ -140,9 +147,15 @@ const handleRequestData = async(url, {
     let s = Buffer.from(bHh, 'hex').toString()
     s = s.replace(s.substr(-1), '')
     s = Buffer.from(s, 'base64').toString()
-    const v = process.versions.app.split('-')[0].split('.').map(n => n.length < 3 ? n.padStart(3, '0') : n).join('')
+    const v = process.versions.app
+      .split('-')[0]
+      .split('.')
+      .map((n) => (n.length < 3 ? n.padStart(3, '0') : n))
+      .join('')
     const v2 = process.versions.app.split('-')[1] || ''
-    headers[s] = !s || `${(await handleDeflateRaw(Buffer.from(JSON.stringify(`${url}${v}`.match(regx), null, 1).concat(v)).toString('base64'))).toString('hex')}&${parseInt(v)}${v2}`
+    headers[s] =
+      !s ||
+      `${(await handleDeflateRaw(Buffer.from(JSON.stringify(`${url}${v}`.match(regx), null, 1).concat(v)).toString('base64'))).toString('hex')}&${parseInt(v)}${v2}`
     delete headers[bHh]
   }
 
@@ -176,39 +189,61 @@ const fetchData = (url, { timeout = 15000, ...options }) => {
   }, timeout)
 
   return {
-    request: handleRequestData(url, options).then(options => {
-      return global.fetch(url, {
-        ...options,
-        signal: controller.signal,
-      }).then(resp => (options.binary ? resp.blob() : resp.text()).then(text => {
-        // console.log(options, headers, text)
-        return {
-          headers: resp.headers.map,
-          body: text,
-          statusCode: resp.status,
-          statusMessage: resp.statusText,
-          url: resp.url,
-          ok: resp.ok,
-        }
-      })).then(resp => {
-        if (options.binary) {
-          return blobToBuffer(resp.body).then(buffer => {
-            resp.body = buffer
-            return resp
+    request: handleRequestData(url, options).then((options) => {
+      return global
+        .fetch(url, {
+          ...options,
+          signal: controller.signal,
+        })
+        .then((resp) => {
+            return (options.binary ? resp.blob() : resp.text()).then((text) => {
+              // --- 新增的调试代码 ---
+              console.log('--- Response Body for:', url, '---');
+              try {
+                // 尝试以 JSON 格式打印，如果失败则直接打印文本
+                console.log(JSON.parse(text));
+              } catch (e) {
+                console.log(text);
+              }
+              // --- 调试代码结束 ---
+              return {
+                headers: resp.headers.map,
+                body: text,
+                statusCode: resp.status,
+                statusMessage: resp.statusText,
+                url: resp.url,
+                ok: resp.ok,
+              }
+            });
           })
-        } else {
-          try {
-            resp.body = JSON.parse(resp.body)
-          } catch {}
-          return resp
-        }
-      }).catch(err => {
-        // console.log(err, err.code, err.message)
-        return Promise.reject(err)
-      }).finally(() => {
-        if (id == null) return
-        BackgroundTimer.clearTimeout(id)
-      })
+        .then((resp) => {
+          if (options.binary) {
+            return blobToBuffer(resp.body).then((buffer) => {
+              resp.body = buffer;
+              return resp;
+            });
+          } else {
+            try {
+              const parsedBody = JSON.parse(resp.body);
+              if (parsedBody?.code === 301 && url.includes('music.163.com')) {
+                throw new Error('登录状态已过期');
+              }
+              resp.body = parsedBody;
+            } catch (e) {
+              if (e.message.startsWith('登录状态已过期')) throw e;
+              // 非JSON响应或非登录错误，保持原始body
+            }
+            return resp;
+          }
+        })
+        .catch((err) => {
+          // console.log(err, err.code, err.message)
+          return Promise.reject(err)
+        })
+        .finally(() => {
+          if (id == null) return
+          BackgroundTimer.clearTimeout(id)
+        })
     }),
     abort() {
       controller.abort()
@@ -216,8 +251,8 @@ const fetchData = (url, { timeout = 15000, ...options }) => {
   }
 }
 
-export const checkUrl = async(url, options = {}) => {
-  return fetchData(url, { method: 'head', ...options }).request.then(resp => {
+export const checkUrl = async (url, options = {}) => {
+  return fetchData(url, { method: 'head', ...options }).request.then((resp) => {
     if (resp.statusCode === 200) {
       return Promise.resolve()
     } else {
