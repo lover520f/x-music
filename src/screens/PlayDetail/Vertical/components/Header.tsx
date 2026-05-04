@@ -111,8 +111,13 @@ export default memo(() => {
     updateSetting({ 'player.soundEffect.enable': !soundEffectEnabled })
   }
   const showSoundEffect = () => {
+    // 切换到设置页面
     setNavActiveId('nav_setting')
-    pushSettingScreen('sound_effect')
+    // 延迟一点时间确保页面切换完成
+    setTimeout(() => {
+      // 打开音效设置
+      pushSettingScreen('sound_effect')
+    }, 300)
   }
   return (
     <View
