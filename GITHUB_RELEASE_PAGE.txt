@@ -1,0 +1,86 @@
+================================================================================
+                    X Music v1.0.0 GitHub Release 页面内容
+================================================================================
+
+【访问地址】
+https://github.com/lover520f/x-music/releases/new
+
+【填写内容】
+
+1. Tag version: v1.0.0
+
+2. Target: main（从下拉框选择）
+
+3. Release title: X Music v1.0.0 - 全新品牌发布
+
+4. Description (完整复制以下内容):
+
+## 🎉 X Music v1.0.0 - 全新品牌发布
+
+### ✨ 核心特性
+
+#### 🎛️ 音效功能
+- ✅ 新增音效控制功能（均衡器、低音增强、虚拟混响等）
+- ✅ 播放器音效开关（复选框样式）
+- ✅ 音效按钮快捷访问（点击跳转设置页面）
+- ✅ 默认开启音效功能
+
+#### 🌐 品牌升级
+- ✅ 所有界面文本统一为 X Music
+- ✅ WebDAV 路径更改为 /X_Music/
+- ✅ 下载目录名称更新为 X-Music
+- ✅ 品牌标识：X 音（中文）、X Music（英文）
+
+### 🔧 技术改进
+
+#### 修复
+- ✅ 修复音效按钮点击跳转错误
+- ✅ 修复蓝牙歌词显示问题
+- ✅ 修复品牌文本显示不一致问题
+
+### 📦 下载
+
+选择适合你设备的 APK 文件：
+
+| 文件 | 适用设备 | 大小 |
+|------|---------|------|
+| arm64-v8a | 绝大多数现代 Android 手机（推荐） | 23MB |
+| armeabi-v7a | 老旧 32 位设备 | 22MB |
+| universal | 通用版本（体积较大） | 39MB |
+
+### ⚠️ 注意事项
+- 从旧版本升级需修改 WebDAV 路径为 `/X_Music/`
+- 音效功能默认开启，可在设置中关闭
+
+---
+**全新开始，初心不变！** 🎵
+
+5. ☑️ Set as the latest release（勾选此项）
+
+6. 【上传文件】点击 "Attach binaries by dropping them here or selecting files"
+   从以下目录上传所有 APK 文件：
+   /workspace/lx-music-mobile/android/app/build/outputs/apk/release/
+   
+   需要上传的文件：
+   ✓ x-music-v1.0.0-arm64-v8a.apk
+   ✓ x-music-v1.0.0-armeabi-v7a.apk
+   ✓ x-music-v1.0.0-x86.apk
+   ✓ x-music-v1.0.0-x86_64.apk
+   ✓ x-music-v1.0.0-universal.apk
+
+7. 点击 "Publish release" 按钮
+
+================================================================================
+                发布前请先删除旧的 Releases 和 Tags（如有）
+================================================================================
+
+删除旧 Releases:
+1. 访问：https://github.com/lover520f/x-music/releases/
+2. 点击每个旧版本的 "Delete" 按钮
+3. 确认删除
+
+删除旧 Tags:
+1. 访问：https://github.com/lover520f/x-music/tags/
+2. 点击每个旧 tag 右侧的删除图标
+
+================================================================================

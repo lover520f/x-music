@@ -15,9 +15,9 @@ import TimeoutExitBtn from './TimeoutExitBtn'
 import Marquee from './Marquee'
 import StatusBar from '@/components/common/StatusBar'
 import { useSetting } from '@/store/setting/hook'
-import { updateSetting } from '@/core/common'
+import { updateSetting, setNavActiveId } from '@/core/common'
 import SoundEffectControl from '@/components/player/SoundEffectControl'
-import { setNavActiveId } from '@/core/common'
+import { pushSettingScreen } from '@/screens/Home/Views/Setting/utils'
 
 export const HEADER_HEIGHT = scaleSizeH(_HEADER_HEIGHT)
 
@@ -112,9 +112,7 @@ export default memo(() => {
   }
   const showSoundEffect = () => {
     setNavActiveId('nav_setting')
-    import('@/screens/Home/Views/Setting/utils').then(({ pushSettingScreen }) => {
-      pushSettingScreen('sound_effect')
-    })
+    pushSettingScreen('sound_effect')
   }
   return (
     <View
