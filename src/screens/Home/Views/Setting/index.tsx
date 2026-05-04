@@ -1,5 +1,5 @@
 import { useHorizontalMode } from '@/utils/hooks'
-import Vertical from './Vertical'
+import Vertical, { type VerticalType } from './Vertical'
 import Horizontal from './Horizontal'
 import { useBackHandler } from '@/utils/hooks/useBackHandler'
 import { useCallback, useEffect, useRef } from 'react'
@@ -12,12 +12,20 @@ export type { SettingScreenIds } from './Main'
 export default () => {
   const isHorizontalMode = useHorizontalMode()
   const mainRef = useRef<MainType>(null)
+  const verticalRef = useRef<VerticalType>(null)
 
   // 监听音效按钮点击事件
   useEffect(() => {
     const handleOpenSoundEffect = () => {
-      if (mainRef.current && commonState.navActiveId === 'nav_setting') {
-        mainRef.current.setActiveId('sound_effect')
+      if (commonState.navActiveId === 'nav_setting') {
+        // Horizontal 模式：切换到音效设置项
+        if (mainRef.current) {
+          mainRef.current.setActiveId('sound_effect')
+        }
+        // Vertical 模式：滚动到音效设置区域
+        if (verticalRef.current) {
+          verticalRef.current.scrollToId('sound_effect')
+        }
       }
     }
 
@@ -40,5 +48,5 @@ export default () => {
     }, [])
   )
 
-  return isHorizontalMode ? <Horizontal mainRef={mainRef} /> : <Vertical mainRef={mainRef} />
+  return isHorizontalMode ? <Horizontal mainRef={mainRef} /> : <Vertical ref={verticalRef} />
 }

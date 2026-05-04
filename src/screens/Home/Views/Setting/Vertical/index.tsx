@@ -1,4 +1,5 @@
 export { default } from './Main'
+export type { VerticalType } from './Main'
 // // import { View } from 'react-native'
 // import Main from './Main'
 // import { createStyle } from '@/utils/tools'

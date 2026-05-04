@@ -5,12 +5,12 @@ export const pushSettingScreen = (id: string) => {
     return
   }
   
-  // 设置全局 settingActiveId
+  // 设置全局 settingActiveId（用于 Horizontal 模式）
   global.lx.settingActiveId = id
   
-  // 触发 app_event 通知设置界面
+  // 触发事件通知设置页面（Horizontal 模式使用）
   if (global.app_event && global.app_event.emit) {
-    global.app_event.emit('setting-active-id-changed', { id })
+    global.app_event.emit('open-setting-sound-effect')
   }
 }
 

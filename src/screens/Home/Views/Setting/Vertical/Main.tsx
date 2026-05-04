@@ -1,5 +1,5 @@
-import { memo } from 'react'
-import {FlatList, type FlatListProps, ScrollView} from 'react-native'
+import { memo, useCallback, useRef } from 'react'
+import {FlatList, type FlatListProps, ScrollView, View} from 'react-native'
 
 import Basic from '../settings/Basic'
 import Player from '../settings/Player'
@@ -12,6 +12,7 @@ import Backup from '../settings/Backup'
 import Other from '../settings/Other'
 import Version from '../settings/Version'
 import About from '../settings/About'
+import SoundEffect from '../settings/SoundEffect'
 import { createStyle } from '@/utils/tools'
 import { SETTING_SCREENS, type SettingScreenIds } from '../Main'
 
@@ -50,6 +51,8 @@ const ListItem = memo(
         return <Version />
       case 'about':
         return <About />
+      case 'sound_effect':
+        return <SoundEffect />
       case 'basic':
         return <Basic />
     }
@@ -57,13 +60,42 @@ const ListItem = memo(
   () => true
 )
 
-export default () => {
-  const renderItem: FlatListType['renderItem'] = ({ item }) => <ListItem id={item} />
-  const getkey: FlatListType['keyExtractor'] = (item) => item
+export interface VerticalType {
+  scrollToId: (id: SettingScreenIds) => void
+}
+
+const Main = () => {
+  const scrollViewRef = useRef<ScrollView>(null)
+  const itemRefs = useRef<Map<string, any>>(new Map())
+
+  const scrollToId = useCallback((id: SettingScreenIds) => {
+    const index = SETTING_SCREENS.indexOf(id)
+    if (index >= 0 && scrollViewRef.current) {
+      // 简单方案：直接滚动到底部附近（音效设置在底部）
+      // TODO: 改进为精确定位到特定元素
+      scrollViewRef.current.scrollToEnd({ animated: true })
+    }
+  }, [])
 
   return (
-    <ScrollView keyboardShouldPersistTaps={'always'} contentContainerStyle={styles.content}>
-      {SETTING_SCREENS.map(id => <ListItem id={id} key={id} />)}
+    <ScrollView 
+      ref={scrollViewRef}
+      keyboardShouldPersistTaps={'always'} 
+      contentContainerStyle={styles.content}
+    >
+      {SETTING_SCREENS.map(id => (
+        <View 
+          key={id} 
+          ref={(ref) => {
+            if (ref) itemRefs.current.set(id, ref)
+            else itemRefs.current.delete(id)
+          }}
+        >
+          <ListItem id={id} />
+        </View>
+      ))}
     </ScrollView>
   )
 }
+
+export default Main
