@@ -1,4 +1,10 @@
 export const pushSettingScreen = (id: string) => {
+  // 安全检查：确保 global.lx 已初始化
+  if (!global.lx) {
+    console.error('[Setting] global.lx is not initialized')
+    return
+  }
+  
   // 设置全局 settingActiveId
   global.lx.settingActiveId = id
   
