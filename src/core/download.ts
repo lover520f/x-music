@@ -145,7 +145,7 @@ const handleMetadata = async (task: DownloadTask, filePath: string) => {
     }
   }
 
-  const downloadDir = settingState.setting['download.path'] || (RNFetchBlob.fs.dirs.MusicDir + '/LX-N Music')
+  const downloadDir = settingState.setting['download.path'] || (RNFetchBlob.fs.dirs.MusicDir + '/X Music')
   // 写入封面
   if (settingState.setting['download.writePicture']) {
     try {
@@ -321,7 +321,7 @@ export const addTask = (musicInfo: LX.Music.MusicInfo, quality: LX.Quality, isFo
     .replace('歌名', musicInfo.name)
     .replace('歌手', finalSingerString);
   fileName = filterFileName(fileName);
-  const downloadDir = settingState.setting['download.path'] || (RNFetchBlob.fs.dirs.MusicDir + '/LX-N Music');
+  const downloadDir = settingState.setting['download.path'] || (RNFetchBlob.fs.dirs.MusicDir + '/X Music');
   const filePath = `${downloadDir}/${fileName}.${extension}`;
 
   const task: DownloadTask = {

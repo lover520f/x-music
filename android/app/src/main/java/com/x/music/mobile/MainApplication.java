@@ -14,6 +14,7 @@ import com.x.music.mobile.crypto.CryptoPackage;
 import com.x.music.mobile.lyric.LyricPackage;
 import com.x.music.mobile.userApi.UserApiPackage;
 import com.x.music.mobile.utils.UtilsPackage;
+import com.x.music.mobile.soundeffect.SoundEffectPackage;
 
 public class MainApplication extends NavigationApplication {
 
@@ -35,6 +36,7 @@ public class MainApplication extends NavigationApplication {
           packages.add(new UtilsPackage());
           packages.add(new CryptoPackage());
           packages.add(new UserApiPackage());
+          packages.add(new SoundEffectPackage());
           return packages;
         }
 

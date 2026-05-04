@@ -45,6 +45,7 @@ const defaultSetting: LX.AppSetting = {
   'player.isShowNotificationImage': true,
   'player.isS2t': true,
   'player.isShowBluetoothLyric': false,
+  'player.soundEffect.enable': true,
 
   'playDetail.isCoverSpin': true,
   'playDetail.style.align': 'center',
@@ -109,7 +110,7 @@ const defaultSetting: LX.AppSetting = {
   'sync.webdav.url': '',
   'sync.webdav.username': '',
   'sync.webdav.password': '',
-  'sync.webdav.path': '/LX_Music/',
+  'sync.webdav.path': '/X_Music/',
   'sync.webdav.lastSyncTimeLists': 0,
 
   'theme.id': 'green',

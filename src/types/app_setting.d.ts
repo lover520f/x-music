@@ -409,6 +409,26 @@ declare global {
       'sync.webdav.password': string;
       'sync.webdav.path': string;
       'sync.webdav.lastSyncTimeLists': number;
+
+      'player.soundEffect.enabled': boolean
+      'player.soundEffect.preset': LX.SoundEffectPresetId
+      'player.soundEffect.eq.31': number
+      'player.soundEffect.eq.62': number
+      'player.soundEffect.eq.125': number
+      'player.soundEffect.eq.250': number
+      'player.soundEffect.eq.500': number
+      'player.soundEffect.eq.1000': number
+      'player.soundEffect.eq.2000': number
+      'player.soundEffect.eq.4000': number
+      'player.soundEffect.eq.8000': number
+      'player.soundEffect.eq.16000': number
+      'player.soundEffect.convolution.fileName': string
+      'player.soundEffect.convolution.mainGain': number
+      'player.soundEffect.convolution.sendGain': number
+      'player.soundEffect.panner.enable': boolean
+      'player.soundEffect.panner.soundR': number
+      'player.soundEffect.panner.speed': number
+      'player.soundEffect.pitchShifter.playbackRate': number
     }
   }
 }

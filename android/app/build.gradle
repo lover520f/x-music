@@ -100,7 +100,7 @@ def getNpmPackageJson() {
 def npmPackageJson = getNpmPackageJson()
 def verCode = npmPackageJson["versionCode"]
 def verName = npmPackageJson["version"]
-def applicationName = npmPackageJson["name"]
+def applicationName = "x-music"
 
 android {
     ndkVersion rootProject.ext.ndkVersion
@@ -108,9 +108,10 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "cn.toside.music.mobile"
+    namespace "com.x.music.mobile"
+    
     defaultConfig {
-        applicationId "cn.toside.music.mobile"
+        applicationId "com.x.music.mobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode verCode

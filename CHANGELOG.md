@@ -6,6 +6,65 @@ Project versioning adheres to [Semantic Versioning](http://semver.org/).
 Commit convention is based on [Conventional Commits](http://conventionalcommits.org).
 Change log format is based on [Keep a Changelog](http://keepachangelog.com/).
 
+## [1.0.0](https://github.com/lyswhut/lx-music-mobile/compare/v1.8.4...v1.0.0) - 2026-05-04
+
+## X Music 移动版本 - v1.0.0 全新发布
+
+### 🎉 重生发布
+
+本项目正式更名为 **X Music**，以全新的姿态继续为音乐爱好者服务。
+
+### ✨ 核心特性
+
+#### 音效功能
+- ✅ 新增音效控制功能（均衡器、低音增强、虚拟混响等）
+- ✅ 播放器音效开关（复选框样式）
+- ✅ 音效按钮快捷访问（点击跳转设置页面）
+- ✅ 默认开启音效功能
+
+#### 品牌升级
+- ✅ 所有界面文本统一为 X Music
+- ✅ WebDAV 路径更改为 /X_Music/
+- ✅ 下载目录名称更新为 X-Music
+- ✅ 品牌标识：X 音（中文）、X Music（英文）
+
+### 🔧 技术改进
+
+#### 修复
+- ✅ 修复音效按钮点击跳转错误
+- ✅ 修复蓝牙歌词显示问题（#1042）
+- ✅ 修复品牌文本显示不一致问题
+
+#### 优化
+- ✅ 音效按钮使用正确的导航方式
+- ✅ 设置页面路由优化
+- ✅ 构建脚本优化（APK 文件名改为 x-music 前缀）
+
+### 📦 构建产物
+
+本次发布包含以下 APK 文件：
+- `x-music-v1.0.0-arm64-v8a.apk` (23MB) - ARM 64 位架构
+- `x-music-v1.0.0-armeabi-v7a.apk` (22MB) - ARM 32 位架构
+- `x-music-v1.0.0-universal.apk` (39MB) - 通用版本
+- `x-music-v1.0.0-x86.apk` (23MB) - x86 模拟器
+- `x-music-v1.0.0-x86_64.apk` (23MB) - x86_64 模拟器
+
+### 📝 使用说明
+
+1. **音效设置**：点击播放详情页的音效按钮（音量图标）或进入 设置 → 音效设置 → 音效控制
+2. **WebDAV 同步**：设置 → 同步与恢复 → WebDAV 同步，路径使用 `/X_Music/`
+3. **品牌说明**：本项目已更名为 X Music，原 LX-N Music 相关功能全部迁移
+
+### ⚠️ 注意事项
+
+- 从旧版本升级的用户需要手动修改 WebDAV 路径为 `/X_Music/`
+- 音效功能默认开启，可在设置中关闭
+- 若遇到音效相关问题，请清除应用缓存后重试
+
+---
+
+**全新开始，初心不变！** 🎵
+
 ## [1.8.4](https://github.com/lyswhut/lx-music-mobile/compare/v1.8.3...v1.8.4) - 2026-05-01
 
 我们很高兴地宣布新项目 Any Listen 的桌面版已发布，目前已支持列表跟随本地文件自动更新、加载并播放WebDAV上的歌曲等功能，更多功能仍在积极开发中，桌面版与Web版将同步更新。

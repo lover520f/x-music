@@ -11,6 +11,7 @@ import Backup from './settings/Backup'
 import Other from './settings/Other'
 import Version from './settings/Version'
 import About from './settings/About'
+import SoundEffect from './settings/SoundEffect'
 
 export const SETTING_SCREENS = [
   'basic',
@@ -24,6 +25,7 @@ export const SETTING_SCREENS = [
   'other',
   'version',
   'about',
+  'sound_effect',
 ] as const
 
 export type SettingScreenIds = (typeof SETTING_SCREENS)[number]
@@ -70,6 +72,8 @@ const Main = forwardRef<MainType, {}>((props, ref) => {
         return <Version />
       case 'about':
         return <About />
+      case 'sound_effect':
+        return <SoundEffect />
       case 'basic':
       default:
         return <Basic />

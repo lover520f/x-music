@@ -3,7 +3,6 @@ import { View, TouchableOpacity } from 'react-native'
 
 import { Icon } from '@/components/common/Icon'
 import { pop } from '@/navigation'
-// import { AppColors } from '@/theme'
 import StatusBar from '@/components/common/StatusBar'
 import { useI18n } from '@/lang'
 import { createStyle } from '@/utils/tools'
@@ -12,6 +11,7 @@ import { HEADER_HEIGHT as _HEADER_HEIGHT } from '@/config/constant'
 import { scaleSizeH } from '@/utils/pixelRatio'
 import commonState from '@/store/common/state'
 import { useStatusbarHeight } from '@/store/common/hook'
+import { COMPONENT_IDS } from '@/config/constant'
 
 const HEADER_HEIGHT = scaleSizeH(_HEADER_HEIGHT)
 
@@ -20,7 +20,10 @@ export default memo(({ musicInfo }: { musicInfo: LX.Music.MusicInfo }) => {
   const statusBarHeight = useStatusbarHeight()
 
   const back = () => {
-    void pop(commonState.componentIds.comment!)
+    const commentComponentId = commonState.componentIds.find(item => item.name === COMPONENT_IDS.comment)?.id
+    if (commentComponentId) {
+      void pop(commentComponentId)
+    }
   }
 
   return (

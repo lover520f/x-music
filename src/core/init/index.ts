@@ -1,5 +1,6 @@
 import { initSetting, showPactModal } from '@/core/common'
 import registerPlaybackService from '@/plugins/player/service'
+import { registerSoundEffectService } from '@/plugins/player/soundEffect/service'
 import initTheme from './theme'
 import initI18n from './i18n'
 import initUserApi from './userApi'
@@ -66,7 +67,8 @@ export default async () => {
   bootLog('Api inited.')
 
   registerPlaybackService()
-  bootLog('Playback Service Registered.')
+  registerSoundEffectService()
+  bootLog('Playback Service & Sound Effect Registered.')
   await initPlayer(setting)
   bootLog('Player inited.')
   await dataInit(setting)

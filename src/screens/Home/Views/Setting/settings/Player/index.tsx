@@ -12,6 +12,7 @@ import IsShowLyricTranslation from './IsShowLyricTranslation'
 import IsShowLyricRoma from './IsShowLyricRoma'
 import IsS2T from './IsS2T'
 import MaxCache from './MaxCache'
+import SoundEffect from './SoundEffect'
 import { useI18n } from '@/lang'
 
 export default memo(() => {
@@ -19,6 +20,7 @@ export default memo(() => {
 
   return (
     <Section title={t('setting_player')}>
+      <SoundEffect />
       <IsSavePlayTime />
       <IsAutoCleanPlayedList />
       <IsHandleAudioFocus />
