@@ -998,3 +998,4 @@ const styles = createStyle({
     minWidth: 0,
   },
 })
+export default SoundEffectControlComponent
