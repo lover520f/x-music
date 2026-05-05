@@ -61,7 +61,7 @@ async function ensureDirectoryExists(cli: any, dirPath: string): Promise<void> {
 
 /**
  * 上传文件，如果父目录不存在则自动逐级创建。
- * @param path 完整的文件路径，例如 /X_Music/playlists.json
+ * @param path 完整的文件路径，例如 /LX_Music/playlists.json
  * @param content 文件内容
  */
 export async function uploadFile(path: string, content: string): Promise<void> {

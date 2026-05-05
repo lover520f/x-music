@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native'
 
 import { Icon } from '@/components/common/Icon'
@@ -487,10 +487,10 @@ const SurroundSection = memo(({
   )
 })
 
-const SoundEffectControlComponent = forwardRef(({ showTip = true, layoutMode = 'split' }: {
+export default memo(({ showTip = true, layoutMode = 'split' }: {
   showTip?: boolean
   layoutMode?: LayoutMode
-}, ref) => {
+}) => {
   const t = useI18n()
   const theme = useTheme()
   const dividerColor = theme['c-primary-alpha-500']
@@ -499,7 +499,6 @@ const SoundEffectControlComponent = forwardRef(({ showTip = true, layoutMode = '
   const [previewGains, setPreviewGains] = useState<PreviewGains>(() => getEqualizerGains(setting))
   const [userEqPresetList, setUserEqPresetList] = useState<LX.SoundEffect.EQPreset[]>([])
   const [userConvolutionPresetList, setUserConvolutionPresetList] = useState<LX.SoundEffect.ConvolutionPreset[]>([])
-  const [isVisible, setIsVisible] = useState(false)
   const presetId = normalizeEqualizerPresetId(setting['player.soundEffect.preset'])
   const convolutionSource = setting['player.soundEffect.convolution.fileName']
   const convolutionMainGain = setting['player.soundEffect.convolution.mainGain']
@@ -518,11 +517,6 @@ const SoundEffectControlComponent = forwardRef(({ showTip = true, layoutMode = '
   )?.id ?? null, [convolutionMainGain, convolutionSendGain, convolutionSource, userConvolutionPresetList])
   const isEqPresetLimitReached = userEqPresetList.length >= maxUserPresetCount
   const isConvolutionPresetLimitReached = userConvolutionPresetList.length >= maxUserPresetCount
-
-  useImperativeHandle(ref, () => ({
-    show: () => setIsVisible(true),
-    hide: () => setIsVisible(false),
-  }), [])
 
   useEffect(() => {
     setPreviewGains(getEqualizerGains(setting))
@@ -998,4 +992,3 @@ const styles = createStyle({
     minWidth: 0,
   },
 })
-export default SoundEffectControlComponent

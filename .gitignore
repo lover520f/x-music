@@ -66,11 +66,3 @@ buck-out/
 
 # testing
 /coverage
-
-# Dependencies
-node_modules/
-
-# Build
-android/app/build/
-android/.gradle/
-build/

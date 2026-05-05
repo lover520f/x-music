@@ -1,5 +1,5 @@
-import { memo, useRef, useCallback, useMemo, useState } from 'react'
-import { View, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native'
+import { memo, useRef, useCallback, useMemo } from 'react'
+import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import { Icon } from '@/components/common/Icon'
 import { pop, navigations } from '@/navigation'
 import { useTheme } from '@/store/theme/hook'
@@ -9,15 +9,14 @@ import { scaleSizeH } from '@/utils/pixelRatio'
 import { HEADER_HEIGHT as _HEADER_HEIGHT, NAV_SHEAR_NATIVE_IDS } from '@/config/constant'
 import commonState from '@/store/common/state'
 import SettingPopup, { type SettingPopupType } from '../../components/SettingPopup'
+import SoundEffectPopup, { type SoundEffectPopupType } from '../../components/SoundEffectPopup'
 import { useStatusbarHeight } from '@/store/common/hook'
+import { useSetting } from '@/store/setting/hook'
+import { isSoundEffectActive } from '@/plugins/player/soundEffect'
 import Btn from './Btn'
 import TimeoutExitBtn from './TimeoutExitBtn'
 import Marquee from './Marquee'
 import StatusBar from '@/components/common/StatusBar'
-import { useSetting } from '@/store/setting/hook'
-import { updateSetting, setNavActiveId } from '@/core/common'
-import SoundEffectControl from '@/components/player/SoundEffectControl'
-import { pushSettingScreen } from '@/screens/Home/Views/Setting/utils'
 
 export const HEADER_HEIGHT = scaleSizeH(_HEADER_HEIGHT)
 
@@ -97,28 +96,21 @@ const Title = () => {
 
 export default memo(() => {
   const popupRef = useRef<SettingPopupType>(null)
+  const soundEffectPopupRef = useRef<SoundEffectPopupType>(null)
   const statusBarHeight = useStatusbarHeight()
+  const theme = useTheme()
   const setting = useSetting()
-  const soundEffectEnabled = setting['player.soundEffect.enable'] ?? true
-  
+
   const back = () => {
     void pop(commonState.componentIds[commonState.componentIds.length - 1]?.id!)
   }
   const showSetting = () => {
     popupRef.current?.show()
   }
-  const toggleSoundEffect = () => {
-    updateSetting({ 'player.soundEffect.enable': !soundEffectEnabled })
-  }
   const showSoundEffect = () => {
-    // 切换到设置页面
-    setNavActiveId('nav_setting')
-    // 延迟一点时间确保页面切换完成
-    setTimeout(() => {
-      // 打开音效设置
-      pushSettingScreen('sound_effect')
-    }, 300)
+    soundEffectPopupRef.current?.show()
   }
+
   return (
     <View
       style={{ height: HEADER_HEIGHT + statusBarHeight, paddingTop: statusBarHeight }}
@@ -129,11 +121,10 @@ export default memo(() => {
         <Btn icon="chevron-left" onPress={back} />
         <Title />
         <TimeoutExitBtn />
-        {soundEffectEnabled ? (
-          <Btn icon="volume-higt" onPress={showSoundEffect} />
-        ) : null}
-        <Btn icon="slider" onPress={showSetting} />
+        <Btn icon="slider" color={isSoundEffectActive(setting) ? theme['c-primary-font-active'] : undefined} onPress={showSoundEffect} />
+        <Btn icon="setting" size={16} onPress={showSetting} />
       </View>
+      <SoundEffectPopup ref={soundEffectPopupRef} layoutMode="stacked" />
       <SettingPopup ref={popupRef} direction="vertical" />
     </View>
   )

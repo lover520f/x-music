@@ -24,7 +24,6 @@ import type {
   SoundEffectPlaybackPath,
   SoundEffectSupportState,
 } from './types'
-import { isSoundEffectSupported, initializeSoundEffect, releaseSoundEffect } from '@/utils/nativeModules/soundEffect'
 
 const soundEffectAdapters: readonly SoundEffectAdapter[] = [nativeEqualizerAdapter]
 const coveragePriority: Record<SoundEffectPlaybackCoverage, number> = {
@@ -170,5 +169,3 @@ export const soundEffectController = {
   applyCurrentConfig,
   applyCurrentEqualizerConfig,
 }
-
-export { isSoundEffectSettingKey } from './constants'

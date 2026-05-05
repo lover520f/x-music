@@ -2,7 +2,7 @@ import { isSoundEffectSupported, updateNativeSoundEffectConfig } from '@/utils/n
 import type { SoundEffectAdapter } from '../types'
 
 export const nativeEqualizerAdapter: SoundEffectAdapter = {
-  id: 'native_ios_sound_effect',
+  id: 'native_android_sound_effect',
   capabilities: {
     equalizer: true,
     convolution: true,

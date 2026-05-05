@@ -24,7 +24,7 @@ export default memo(() => {
   return (
     <Section title={t('setting_about')}>
       <View style={styles.part}>
-        <Text style={styles.text}>本软件(X Music简称X Music)完全免费，代码已开源。开源地址：</Text>
+        <Text style={styles.text}>本软件(LX-Netease Music简称LX-N Music)完全免费，代码已开源。开源地址：</Text>
         <TouchableOpacity onPress={openHomePage}>
           <Text style={textLinkStyle}>https://github.com/souvenp/lx-netease-music-mobile</Text>
         </TouchableOpacity>

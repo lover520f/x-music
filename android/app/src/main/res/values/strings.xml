@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">X音</string>
+    <string name="widget_description">X音 Widget</string>
 </resources>

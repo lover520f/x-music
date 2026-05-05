@@ -12,7 +12,6 @@ import Backup from '../settings/Backup'
 import Other from '../settings/Other'
 import Version from '../settings/Version'
 import About from '../settings/About'
-import SoundEffect from '../settings/SoundEffect'
 import { createStyle } from '@/utils/tools'
 import { SETTING_SCREENS, type SettingScreenIds } from '../Main'
 
@@ -51,10 +50,7 @@ const ListItem = memo(
         return <Version />
       case 'about':
         return <About />
-      case 'sound_effect':
-        return <SoundEffect />
       case 'basic':
-      default:
         return <Basic />
     }
   },

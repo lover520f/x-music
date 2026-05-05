@@ -1,4 +1,12 @@
-rootProject.name = 'cn.toside.music.mobile'
+pluginManagement {
+    repositories {
+        mavenCentral()
+        google()
+        gradlePluginPortal()
+    }
+}
+
+rootProject.name = 'com.my.music.moblie'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
