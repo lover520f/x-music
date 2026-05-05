@@ -16,6 +16,10 @@ public class DynamicsProcessor {
         updateCoefficients();
     }
 
+    public void reset() {
+        this.currentGain = 1.0f;
+    }
+
     private void updateCoefficients() {
         attackCoeff = (float) Math.exp(-1.0 / (0.001f * sampleRate));
         releaseCoeff = (float) Math.exp(-1.0 / (0.08f * sampleRate));

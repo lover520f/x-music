@@ -69,6 +69,12 @@ public class EqualizerProcessor {
         }
     }
 
+    public void reset() {
+        for (int i = 0; i < filters.length; i++) {
+            filters[i].reset();
+        }
+    }
+
     private static class BiquadFilter {
         private float b0, b1, b2, a1, a2;
         private float z1, z2;

@@ -25,6 +25,10 @@ public class PitchProcessor {
         this.sampleRate = sampleRate;
     }
 
+    public void reset() {
+        initChannels();
+    }
+
     private void initChannels() {
         channelStates = new ChannelState[channels];
         for (int i = 0; i < channels; i++) {

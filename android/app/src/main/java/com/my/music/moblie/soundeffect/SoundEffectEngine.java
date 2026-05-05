@@ -20,6 +20,28 @@ public class SoundEffectEngine {
 
     public SoundEffectEngine(Context context) {
         this.context = context;
+        // Initialize processors
+        this.equalizer = new EqualizerProcessor();
+        this.convolution = new ConvolutionProcessor(context);
+        this.panner = new PannerProcessor();
+        this.pitch = new PitchProcessor();
+        this.dynamics = new DynamicsProcessor();
+    }
+
+    public void setSampleRate(float sampleRate) {
+        if (equalizer != null) equalizer.setSampleRate(sampleRate);
+        if (convolution != null) convolution.setSampleRate(sampleRate);
+        if (panner != null) panner.setSampleRate(sampleRate);
+        if (pitch != null) pitch.setSampleRate(sampleRate);
+        if (dynamics != null) dynamics.setSampleRate(sampleRate);
+    }
+
+    public void flush() {
+        // Reset processor states for seek/flush operations
+        if (equalizer != null) equalizer.reset();
+        if (panner != null) panner.reset();
+        if (pitch != null) pitch.reset();
+        if (convolution != null) convolution.reset();
     }
 
     public void updateConfig(ReadableMap configMap) {

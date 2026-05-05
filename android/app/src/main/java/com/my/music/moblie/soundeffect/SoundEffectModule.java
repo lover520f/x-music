@@ -1,6 +1,7 @@
 package com.my.music.moblie.soundeffect;
 
 import androidx.annotation.NonNull;
+import android.content.Context;
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
@@ -12,11 +13,20 @@ import java.util.Map;
 
 public class SoundEffectModule extends ReactContextBaseJavaModule {
     private static final String NAME = "LXSoundEffect";
+    private static SoundEffectEngine sharedEngine;
     private final SoundEffectEngine engine;
 
     public SoundEffectModule(ReactApplicationContext reactContext) {
         super(reactContext);
         this.engine = new SoundEffectEngine(reactContext);
+        sharedEngine = this.engine;
+    }
+
+    public static SoundEffectEngine getSharedEngine(Context context) {
+        if (sharedEngine == null) {
+            sharedEngine = new SoundEffectEngine(context);
+        }
+        return sharedEngine;
     }
 
     @NonNull

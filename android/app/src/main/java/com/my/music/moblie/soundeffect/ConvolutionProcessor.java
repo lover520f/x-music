@@ -40,6 +40,21 @@ public class ConvolutionProcessor {
         }
     }
 
+    public void setSampleRate(float sampleRate) {
+        // Convolution doesn't depend on sample rate directly
+    }
+
+    public void reset() {
+        inputFill = 0;
+        outputReadIndex = 0;
+        outputFrameCount = 0;
+        if (overlapBuffers != null) {
+            for (int ch = 0; ch < overlapBuffers.length; ch++) {
+                java.util.Arrays.fill(overlapBuffers[ch], 0.0f);
+            }
+        }
+    }
+
     private void loadImpulseResponse(SoundEffectConfig config) {
         // 这里应该实际加载混响样本，暂时使用简单的脉冲响应
         // 真实应用中需要从 assets 或资源文件加载 WAV 格式的混响样本

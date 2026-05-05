@@ -25,6 +25,12 @@ public class PannerProcessor {
         this.sampleRate = sampleRate;
     }
 
+    public void reset() {
+        this.processedSamples = 0;
+        leftDelay = new DelayLine(1000);
+        rightDelay = new DelayLine(1000);
+    }
+
     public void process(float[] samples, int channels) {
         if (!enabled || channels < 2) return;
 
