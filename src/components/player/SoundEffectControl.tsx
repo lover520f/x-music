@@ -31,6 +31,7 @@ import {
   saveUserConvolutionPreset,
   saveUserEQPreset,
 } from '@/store/soundEffect'
+import MoeKoeEQPanel from './MoeKoeEQPanel'
 
 const minGain = -15
 const maxGain = 15
@@ -137,158 +138,6 @@ const PresetAddButton = memo(({
       }}>
       <Text size={15} color={theme['c-primary-font-active']} style={styles.presetAddText}>+</Text>
     </TouchableOpacity>
-  )
-})
-
-const EqualizerSection = memo(({
-  presetId,
-  previewGains,
-  userPresetList,
-  activeUserPresetId,
-  onReset,
-  onPresetPress,
-  onSavePreset,
-  saveDisabled,
-  onUserPresetPress,
-  onUserPresetLongPress,
-  onValueChange,
-  onSlidingComplete,
-  layoutMode,
-}: {
-  presetId: LX.SoundEffectPresetId
-  previewGains: PreviewGains
-  userPresetList: LX.SoundEffect.EQPreset[]
-  activeUserPresetId: string | null
-  onReset: () => void
-  onPresetPress: (presetId: Exclude<LX.SoundEffectPresetId, 'custom'>) => void
-  onSavePreset: () => void
-  saveDisabled: boolean
-  onUserPresetPress: (preset: LX.SoundEffect.EQPreset) => void
-  onUserPresetLongPress: (preset: LX.SoundEffect.EQPreset) => void
-  onValueChange: (frequency: typeof equalizerFrequencies[number], value: number) => void
-  onSlidingComplete: (frequency: typeof equalizerFrequencies[number], value: number) => void
-  layoutMode: LayoutMode
-}) => {
-  const t = useI18n()
-  const theme = useTheme()
-  const dividerColor = theme['c-primary-alpha-500']
-
-  const equalizerRows = useMemo(() => {
-    const result: Array<Array<typeof equalizerFrequencies[number]>> = []
-    for (let index = 0; index < equalizerFrequencies.length; index += 2) {
-      result.push(equalizerFrequencies.slice(index, index + 2))
-    }
-    return result
-  }, [])
-
-  return (
-    <View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{t('setting_play_sound_effect_equalizer')}</Text>
-        <View style={styles.headerActions}>
-          <TouchableOpacity activeOpacity={0.7} onPress={onReset} style={{ ...styles.resetButton, backgroundColor: theme['c-button-background'] }}>
-            <Text size={12} color={theme['c-button-font']}>{t('setting_play_sound_effect_reset')}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {layoutMode == 'split'
-        ? (
-            <View style={styles.equalizerGrid}>
-              {equalizerRows.map((row, rowIndex) => (
-                <View key={rowIndex} style={styles.equalizerRow}>
-                  {row.map((frequency, frequencyIndex) => (
-                    <View
-                      key={frequency}
-                      style={{
-                        ...styles.equalizerItem,
-                        borderRightWidth: frequencyIndex == 0 ? 1 : 0,
-                        borderRightColor: dividerColor,
-                        paddingRight: frequencyIndex == 0 ? 8 : 0,
-                        paddingLeft: frequencyIndex == 1 ? 8 : 0,
-                      }}>
-                      <View style={styles.equalizerSliderRow}>
-                        <Text size={13} style={styles.equalizerLabel}>{frequency >= 1000 ? `${frequency / 1000}k` : `${frequency}`}</Text>
-                        <View style={styles.sliderWrap}>
-                          <Slider
-                            minimumValue={minGain}
-                            maximumValue={maxGain}
-                            step={0.1}
-                            value={previewGains[frequency]}
-                            onValueChange={value => { onValueChange(frequency, Number(value)) }}
-                            onSlidingComplete={value => { onSlidingComplete(frequency, Number(value)) }}
-                          />
-                        </View>
-                        <Text size={12} color={theme['c-font-label']} style={styles.equalizerValue}>{formatGain(previewGains[frequency])}</Text>
-                      </View>
-                    </View>
-                  ))}
-                </View>
-              ))}
-            </View>
-          )
-        : (
-            <View style={styles.stackedEqualizerList}>
-              {equalizerFrequencies.map(frequency => (
-                <View key={frequency} style={styles.stackedEqualizerItem}>
-                  <View style={styles.equalizerSliderRow}>
-                    <Text size={13} style={styles.equalizerLabel}>{frequency >= 1000 ? `${frequency / 1000}k` : `${frequency}`}</Text>
-                    <View style={styles.sliderWrap}>
-                      <Slider
-                        minimumValue={minGain}
-                        maximumValue={maxGain}
-                        step={0.1}
-                        value={previewGains[frequency]}
-                        onValueChange={value => { onValueChange(frequency, Number(value)) }}
-                        onSlidingComplete={value => { onSlidingComplete(frequency, Number(value)) }}
-                      />
-                    </View>
-                    <Text size={12} color={theme['c-font-label']} style={styles.equalizerValue}>{formatGain(previewGains[frequency])}</Text>
-                  </View>
-                </View>
-              ))}
-            </View>
-          )}
-
-      <View style={styles.presetList}>
-        {equalizerPresets.filter(preset => preset.id != 'none').map(preset => {
-          const isActive = preset.id == presetId
-          return (
-            <TouchableOpacity
-              key={preset.id}
-              activeOpacity={0.7}
-              style={{
-                ...styles.presetButton,
-                backgroundColor: isActive ? theme['c-button-background-selected'] : theme['c-button-background'],
-              }}
-              onPress={() => { onPresetPress(preset.id) }}>
-              <Text size={13} color={isActive ? theme['c-button-font-selected'] : theme['c-button-font']}>
-                {t(preset.nameKey)}
-              </Text>
-            </TouchableOpacity>
-          )
-        })}
-        {userPresetList.map(preset => {
-          const isActive = preset.id == activeUserPresetId
-          return (
-            <TouchableOpacity
-              key={preset.id}
-              activeOpacity={0.7}
-              style={{
-                ...styles.presetButton,
-                backgroundColor: isActive ? theme['c-button-background-selected'] : theme['c-button-background'],
-              }}
-              onPress={() => { onUserPresetPress(preset) }}
-              onLongPress={() => { onUserPresetLongPress(preset) }}>
-              <Text size={13} color={isActive ? theme['c-button-font-selected'] : theme['c-button-font']}>
-                {preset.name}
-              </Text>
-            </TouchableOpacity>
-          )
-        })}
-        <PresetAddButton onPress={onSavePreset} disabled={saveDisabled} />
-      </View>
-    </View>
   )
 })
 
@@ -719,21 +568,7 @@ export default memo(({ showTip = true, layoutMode = 'split' }: {
           />
         </View>
         <View style={{ ...styles.sectionBlock, ...styles.sectionBlockWithDivider, borderTopColor: dividerColor }}>
-          <EqualizerSection
-            presetId={presetId}
-            previewGains={previewGains}
-            userPresetList={userEqPresetList}
-            activeUserPresetId={activeEqUserPresetId}
-            onReset={handleReset}
-            onPresetPress={handlePresetPress}
-            onSavePreset={handleShowSaveEqPreset}
-            saveDisabled={isEqPresetLimitReached}
-            onUserPresetPress={handleApplyEqPreset}
-            onUserPresetLongPress={preset => { void handleRemoveEqPreset(preset) }}
-            onValueChange={handleValueChange}
-            onSlidingComplete={handleSlidingComplete}
-            layoutMode={layoutMode}
-          />
+          <MoeKoeEQPanel />
         </View>
         <View style={{ ...styles.sectionBlock, ...styles.sectionBlockWithDivider, borderTopColor: dividerColor }}>
           <PitchSection
@@ -812,21 +647,7 @@ export default memo(({ showTip = true, layoutMode = 'split' }: {
 
         <View style={styles.rightColumn}>
           <View style={styles.sectionBlock}>
-            <EqualizerSection
-              presetId={presetId}
-              previewGains={previewGains}
-              userPresetList={userEqPresetList}
-              activeUserPresetId={activeEqUserPresetId}
-              onReset={handleReset}
-              onPresetPress={handlePresetPress}
-              onSavePreset={handleShowSaveEqPreset}
-              saveDisabled={isEqPresetLimitReached}
-              onUserPresetPress={handleApplyEqPreset}
-              onUserPresetLongPress={preset => { void handleRemoveEqPreset(preset) }}
-              onValueChange={handleValueChange}
-              onSlidingComplete={handleSlidingComplete}
-              layoutMode={layoutMode}
-            />
+            <MoeKoeEQPanel />
           </View>
         </View>
       </View>
