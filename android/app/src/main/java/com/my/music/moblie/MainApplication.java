@@ -13,6 +13,7 @@ import com.my.music.moblie.cache.CachePackage;
 import com.my.music.moblie.crypto.CryptoPackage;
 import com.my.music.moblie.lyric.LyricPackage;
 import com.my.music.moblie.soundeffect.SoundEffectPackage;
+import com.my.music.moblie.soundeffect.moekoe.MoeKoeEQPackage;
 import com.my.music.moblie.userApi.UserApiPackage;
 import com.my.music.moblie.utils.UtilsPackage;
 import com.my.music.moblie.widget.WidgetPackage;
@@ -39,6 +40,7 @@ public class MainApplication extends NavigationApplication {
           packages.add(new UserApiPackage());
           packages.add(new WidgetPackage());
           packages.add(new SoundEffectPackage());
+          packages.add(new MoeKoeEQPackage());
           return packages;
         }
 
