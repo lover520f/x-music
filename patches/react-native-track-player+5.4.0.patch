@@ -1,0 +1,67 @@
+diff --git a/node_modules/react-native-track-player/android/src/main/java/com/guichaguri/trackplayer/service/MusicManager.java b/node_modules/react-native-track-player/android/src/main/java/com/guichaguri/trackplayer/service/MusicManager.java
+--- a/node_modules/react-native-track-player/android/src/main/java/com/guichaguri/trackplayer/service/MusicManager.java
++++ b/node_modules/react-native-track-player/android/src/main/java/com/guichaguri/trackplayer/service/MusicManager.java
+@@ -34,9 +34,8 @@ import com.guichaguri.trackplayer.module.MusicEvents;
+ import com.guichaguri.trackplayer.service.metadata.MetadataManager;
+ import com.guichaguri.trackplayer.service.models.Track;
+ import com.guichaguri.trackplayer.service.player.ExoPlayback;
+ import com.guichaguri.trackplayer.service.player.LocalPlayback;
+-import com.guichaguri.trackplayer.service.soundeffect.SoundEffectAudioProcessor;
+-import com.guichaguri.trackplayer.service.soundeffect.SoundEffectEngine;
+-import com.guichaguri.trackplayer.service.soundeffect.SoundEffectModule;
+ import com.guichaguri.trackplayer.service.soundeffect.SoundEffectRenderersFactory;
++import com.guichaguri.trackplayer.service.soundeffect.moekoe.MoeKoeAudioProcessor;
+ 
+ /**
+  * @author Guichaguri
+@@ -53,8 +52,7 @@ public class MusicManager {
+ 
+     private final MetadataManager metadata;
+     private ExoPlayback playback;
+ 
+-    private SoundEffectEngine soundEffectEngine;
+-    private SoundEffectAudioProcessor soundEffectProcessor;
++    private SoundEffectRenderersFactory renderersFactory;
+ 
+     // @RequiresApi(26)
+     // private AudioFocusRequest focus = null;
+@@ -74,9 +72,6 @@ public class MusicManager {
+     public MusicManager(MusicService service) {
+         this.service = service;
+         this.metadata = new MetadataManager(service, this);
+-
+-        // Initialize shared sound effect engine
+-        this.soundEffectEngine = SoundEffectModule.getSharedEngine(service);
+ 
+         PowerManager powerManager = (PowerManager)service.getSystemService(Context.POWER_SERVICE);
+         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "track-player-wake-lock");
+@@ -140,8 +135,8 @@ public class MusicManager {
+                 .setBackBuffer(backBuffer, false)
+                 .build();
+ 
+-        // Use custom renderers factory that injects SoundEffectAudioProcessor
+-        SoundEffectRenderersFactory renderersFactory = new SoundEffectRenderersFactory(service, soundEffectEngine);
++        // Use custom renderers factory that injects MoeKoe 31-Band Equalizer
++        renderersFactory = new SoundEffectRenderersFactory(service);
+ 
+         // Build player with custom renderers factory
+         ExoPlayer.Builder playerBuilder = new ExoPlayer.Builder(service)
+@@ -179,8 +174,16 @@ public class MusicManager {
+         player.setAudioAttributes(new androidx.media3.common.AudioAttributes.Builder()
+                 .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC).setUsage(C.USAGE_MEDIA).build(), shouldHandleAudioFocus);
+ 
+-        Log.d(Utils.LOG, "ExoPlayer created with SoundEffectRenderersFactory");
++        Log.d(Utils.LOG, "ExoPlayer created with MoeKoe 31-Band Equalizer");
+ 
+         return new LocalPlayback(service, this, player, cacheMaxSize, autoUpdateMetadata);
+     }
++
++    /**
++     * Get the MoeKoe audio processor for configuration
++     */
++    public MoeKoeAudioProcessor getMoeKoeProcessor() {
++        if (renderersFactory != null) {
++            return renderersFactory.getMoeKoeProcessor();
++        }
++        return null;
++    }
