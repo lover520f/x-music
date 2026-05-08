@@ -116,28 +116,30 @@ export default memo(({
   const presetList = useMemo(() => MOEKOE_PRESETS.map(p => p.id), [])
 
   const handlePresetPress = async(presetId: string) => {
-    const preset = MOEKOE_PRESETS.find(p => p.id === presetId)
-    if (!preset) return
-
-    setGains([...preset.gains])
-    setActivePreset(presetId)
-
     try {
+      const preset = MOEKOE_PRESETS.find(p => p.id === presetId)
+      if (!preset) {
+        console.error('Preset not found:', presetId)
+        return
+      }
+
+      setGains([...preset.gains])
+      setActivePreset(presetId)
+
       await MoeKoeEQModule.setGains(preset.gains, enabled)
     } catch (error) {
       console.error('Failed to apply preset:', error)
-      ToastAndroid.show(t('moekoe_eq_apply_failed'), ToastAndroid.SHORT)
     }
   }
 
   const handleBandChange = async(frequency: number, index: number, value: number) => {
-    const roundedValue = Math.round(value * 2) / 2
-    const newGains = [...gains]
-    newGains[index] = roundedValue
-    setGains(newGains)
-    setActivePreset('')
-
     try {
+      const roundedValue = Math.round(value * 2) / 2
+      const newGains = [...gains]
+      newGains[index] = roundedValue
+      setGains(newGains)
+      setActivePreset('')
+
       await MoeKoeEQModule.setGains(newGains, enabled)
     } catch (error) {
       console.error('Failed to update gain:', error)
@@ -205,8 +207,8 @@ export default memo(({
             key={freq}
             frequency={freq}
             gain={gains[index]}
-            onValueChange={value => { void handleBandChange(freq, index, value) }}
-            onSlidingComplete={value => { void handleBandChange(freq, index, value) }}
+            onValueChange={(value: number) => { void handleBandChange(freq, index, value) }}
+            onSlidingComplete={(value: number) => { void handleBandChange(freq, index, value) }}
           />
         ))}
       </View>
