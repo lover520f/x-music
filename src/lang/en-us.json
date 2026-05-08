@@ -615,5 +615,7 @@
   "moekoe_preset_harman_target": "Harman Target",
   "moekoe_preset_studio": "Studio",
   "moekoe_preset_vinyl": "Vinyl",
-  "moekoe_preset_hires": "Hi-Res"
+  "moekoe_preset_hires": "Hi-Res",
+  "moekoe_eq_enabled": "Enabled",
+  "moekoe_eq_disabled": "Disabled"
 }

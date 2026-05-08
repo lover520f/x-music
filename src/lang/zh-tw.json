@@ -592,5 +592,7 @@
   "moekoe_preset_harman_target": "哈曼曲線",
   "moekoe_preset_studio": "錄音室",
   "moekoe_preset_vinyl": "黑膠",
-  "moekoe_preset_hires": "高解析"
+  "moekoe_preset_hires": "高解析",
+  "moekoe_eq_enabled": "已啟用",
+  "moekoe_eq_disabled": "已停用"
 }
