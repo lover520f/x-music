@@ -2,7 +2,14 @@ import {memo} from 'react'
 import {View, StyleSheet} from 'react-native'
 import MoeKoeEQScreen from './MoeKoeEQScreen'
 
-const SoundEffectControl = memo(() => {
+type LayoutMode = 'split' | 'stacked'
+
+interface SoundEffectControlProps {
+  showTip?: boolean
+  layoutMode?: LayoutMode
+}
+
+const SoundEffectControl = memo(({showTip, layoutMode}: SoundEffectControlProps) => {
   return (
     <View style={styles.container}>
       <MoeKoeEQScreen />
