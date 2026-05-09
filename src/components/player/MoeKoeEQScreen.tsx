@@ -1,6 +1,4 @@
-import React, {memo, useState, useCallback} from 'react'
-
-
+import React from 'react'
 import {View, Text, StyleSheet, TouchableOpacity, ToastAndroid} from 'react-native'
 import Slider from '@react-native-community/slider'
 import {useI18n} from '@/lang'
@@ -27,14 +25,14 @@ const PRESETS = [
   {id: 'hires', name: 'moekoe_preset_hires', gains: [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,2,2,2,2,3,3,2,2,3,3,3,3]},
 ]
 
-const MoeKoeEQScreen = memo(() => {
+function MoeKoeEQScreen() {
   const t = useI18n()
   const theme = useTheme()
-  const [gains, setGains] = useState(Array(31).fill(0))
-  const [activePreset, setActivePreset] = useState('flat')
-  const [enabled, setEnabled] = useState(true)
+  const [gains, setGains] = React.useState(Array(31).fill(0))
+  const [activePreset, setActivePreset] = React.useState('flat')
+  const [enabled, setEnabled] = React.useState(true)
 
-  const applyGains = async (newGains, presetId) => {
+  const applyGains = React.useCallback(async (newGains, presetId) => {
     try {
       setGains([...newGains])
       if (presetId) setActivePreset(presetId)
@@ -43,16 +41,18 @@ const MoeKoeEQScreen = memo(() => {
       console.log('EQ error:', e.message)
       ToastAndroid.show(t('moekoe_eq_apply_failed') || 'Error', ToastAndroid.SHORT)
     }
-  }
+  }, [enabled, t])
 
-  const applyPreset = async (presetId) => {
+  const applyPreset = React.useCallback(async (presetId) => {
     const preset = PRESETS.find(p => p.id === presetId)
     if (preset) applyGains(preset.gains, presetId)
-  }
+  }, [applyGains])
 
-  const reset = () => applyGains(Array(31).fill(0), 'flat')
+  const reset = React.useCallback(() => {
+    applyGains(Array(31).fill(0), 'flat')
+  }, [applyGains])
 
-  const toggleEnabled = async () => {
+  const toggleEnabled = React.useCallback(async () => {
     const newEnabled = !enabled
     setEnabled(newEnabled)
     try {
@@ -60,10 +60,10 @@ const MoeKoeEQScreen = memo(() => {
     } catch (e) {
       console.log('Toggle error:', e)
     }
-  }
+  }, [enabled])
 
-  const formatFreq = (f) => f >= 1000 ? (f/1000).toFixed(1) + 'k' : String(f)
-  const formatGain = (g) => (g >= 0 ? '+' : '') + g.toFixed(1) + 'dB'
+  const formatFreq = React.useCallback((f) => f >= 1000 ? (f/1000).toFixed(1) + 'k' : String(f), [])
+  const formatGain = React.useCallback((g) => (g >= 0 ? '+' : '') + g.toFixed(1) + 'dB', [])
 
   return (
     <View style={[styles.container, {backgroundColor: theme['c-content']}]}>
@@ -106,7 +106,7 @@ const MoeKoeEQScreen = memo(() => {
       </View>
     </View>
   )
-})
+}
 
 const styles = StyleSheet.create({
   container: {flex: 1, paddingTop: 15, paddingHorizontal: 15},
