@@ -1,8 +1,5 @@
-import { memo, useRef, useState } from 'react'
-import { View } from 'react-native'
-import { createStyle } from '@/utils/tools'
-import { useI18n } from '@/lang'
-import { useTheme } from '@/store/theme/hook'
+import { memo } from 'react'
+import { View, StyleSheet } from 'react-native'
 import MoeKoeEQScreen from './MoeKoeEQScreen'
 
 type LayoutMode = 'split' | 'stacked'
@@ -13,9 +10,6 @@ interface Props {
 }
 
 const SoundEffectControl = memo(({ showTip = false, layoutMode = 'split' }: Props) => {
-  const t = useI18n()
-  const theme = useTheme()
-
   return (
     <View style={styles.container}>
       <MoeKoeEQScreen />
@@ -23,13 +17,13 @@ const SoundEffectControl = memo(({ showTip = false, layoutMode = 'split' }: Prop
   )
 })
 
-const styles = createStyle({
+const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingTop: 5,
     paddingLeft: 15,
     paddingRight: 15,
     paddingBottom: 15,
-    flex: 1,
   },
 })
 

@@ -1,4 +1,6 @@
 import React, {memo, useState, useCallback} from 'react'
+
+
 import {View, Text, StyleSheet, TouchableOpacity, ToastAndroid} from 'react-native'
 import Slider from '@react-native-community/slider'
 import {useI18n} from '@/lang'

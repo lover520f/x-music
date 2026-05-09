@@ -2,7 +2,7 @@ import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { ScrollView, View } from 'react-native'
 import Popup, { type PopupProps, type PopupType } from '@/components/common/Popup'
 import { useI18n } from '@/lang'
-import SoundEffectControl from '@/components/player/SoundEffectControl'
+import MoeKoeEQScreen from '@/components/player/MoeKoeEQScreen'
 
 export interface SoundEffectPopupType {
   show: () => void
@@ -31,7 +31,7 @@ export default forwardRef<SoundEffectPopupType, Omit<PopupProps, 'children'> & {
     <Popup ref={popupRef} title={t('setting_play_sound_effect')} {...props}>
       <ScrollView>
         <View onStartShouldSetResponder={() => true}>
-          <SoundEffectControl showTip={false} layoutMode={layoutMode} />
+          <MoeKoeEQScreen />
         </View>
       </ScrollView>
     </Popup>
